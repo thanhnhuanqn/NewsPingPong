@@ -1,0 +1,17 @@
+Uploads
+bin
+obj
+*.suo
+*.user
+*.sln.docstates
+
+[Db]ebug/
+[Rr]elase/
+
+*.obj
+*.pdb
+
+_ReSharper*
+
+Thumbs.db
+Desktop.ini
