@@ -1,0 +1,218 @@
+﻿@using Microsoft.Web.Helpers;
+@using Santhos.Web.Mvc.BootstrapFlashMessages
+
+@{
+    ViewBag.Title = "Edit Layout & CSS Files";
+
+    //Themes Directory
+    var foldersTheme = new DirectoryInfo(Server.MapPath("~/Themes/"));
+
+    var theme = Request.QueryString["theme"] ?? "";
+
+    var fileToEdit = Request["fileToEdit"] ?? "";
+
+    var fileContent = Request.Unvalidated("fileContent");
+
+    var t = new DirectoryInfo(Server.MapPath("~/Themes/" + theme));
+
+    if (t.Exists)
+    {
+        var foldersName = foldersTheme.GetDirectories();
+
+        if (!foldersName.Any())
+        {
+            return;
+        }
+        //List all Layout files
+        if (string.IsNullOrEmpty(theme))
+        {
+            theme = Microsoft.Web.Helpers.Themes.CurrentTheme;
+        }
+        DirectoryInfo dirInfo = new DirectoryInfo(Server.MapPath("~/Themes/" + theme));
+        FileInfo[] fileInfo = dirInfo.GetFiles("*.cshtml", SearchOption.AllDirectories);
+
+        //List all css files for selected layout
+        FileInfo[] fileInfoCSS = null;
+        //some layout files may not have unique folders with the files
+        try
+        {
+            DirectoryInfo dirInfoCSS = new DirectoryInfo(Server.MapPath("~/Themes/" + theme + "/css"));
+            fileInfoCSS = dirInfoCSS.GetFiles("*.css", SearchOption.TopDirectoryOnly);
+        }
+        catch { }
+
+        var FolderFilePath = fileToEdit.Split('/').ToList();
+
+        var FolderFile = string.Empty;
+        var FileName = string.Empty;
+
+
+        if (FolderFilePath.Count > 1)
+        {
+            FileName = FolderFilePath[FolderFilePath.Count - 1];
+            FolderFilePath.RemoveAt(FolderFilePath.Count - 1);
+            FolderFile = String.Join(@"\\", FolderFilePath);
+        }
+        else
+        {
+            FileName = fileToEdit;
+        }
+
+        if (!string.IsNullOrEmpty(FolderFile))
+        {
+            FolderFile = @"\\" + FolderFile;
+        }
+
+        if (IsPost)
+        {
+            if (!fileContent.IsEmpty() && !fileToEdit.IsEmpty())
+            {
+                try
+                {
+                    var file = new FileInfo(dirInfo.FullName.Replace(@"\", @"\\") + FolderFile + @"\\" + FileName);
+
+                    if (file.Exists)
+                    {
+                        System.IO.File.WriteAllText(file.ToString(), fileContent, System.Text.Encoding.UTF8);
+                        PageData["message"] = "File updated!";                        
+                    }
+                    else
+                    {
+                        PageData["message"] = "File not found!";
+                        fileToEdit = string.Empty;
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    PageData["Message"] = ex.ToString();
+                }
+            }
+        }
+        else if (!fileToEdit.IsEmpty())
+        {
+            var file = new FileInfo(dirInfo.FullName.Replace(@"\", @"\\") + FolderFile + @"\\" + FileName);
+
+            if (file.Exists)
+            {
+                fileContent = System.IO.File.ReadAllText(file.ToString(), System.Text.Encoding.UTF8);
+            }
+            else
+            {
+                PageData["message"] = "File not found!";
+                fileToEdit = string.Empty;
+            }
+        }
+        <div class="row">
+            <div class="col-sm-12">
+                <h3>Edit Themes</h3>
+            </div>
+            <div class="col-sm-12">
+                <div class="row">
+                    <div class="col-sm-8">
+                        <h4 class="text-capitalize"><strong>@theme: @fileToEdit</strong></h4>
+                    </div>
+                    <div class="col-sm-4">
+                        <form action="" method="get" class="form-inline">
+                            <strong><label for="theme">Select theme to edit: </label></strong>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <select name="theme" id="theme" class="form-control input-sm">
+                                        @foreach (var name in foldersName)
+                                        {
+                                            string selected = string.Empty;
+                                            if (theme == name.Name)
+                                            {
+                                                selected = "selected=\"selected\"";
+                                            }
+                                            <option @Html.Raw(selected) value="@name.Name">@name.Name</option>
+                                        }
+                                    </select>
+                                    <div class="input-group-btn">
+                                        <button id="Submit" class="btn btn-default btn-sm" type="submit">Select</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12">                
+                <div class="row">
+                    <div class="col-md-9 col-xs-12">
+                        @CommonHelpers.Alert()
+                        <form method="post" action="">
+                            <div class="form-group">
+                                <textarea class="form-control" name="fileContent" rows="30">@fileContent</textarea>
+                            </div>
+                            <input type="submit" value="Update File" title="Update File" class="btn btn-primary" />
+                        </form>
+                    </div>
+                    <div class="col-md-3 col-xs-12">
+                        <div id="templateside">
+                            <h4>Templates</h4>
+                            <ul>
+                                @if (fileInfo != null)
+                                {
+                                    foreach (var f in fileInfo)
+                                    {
+                                        var ff = f.Directory.ToString();
+                                        ff = ff.Replace(Server.MapPath(Themes.ThemeDirectory + "/" + theme), "");
+                                        ff = ff.Replace("\\", "/").TrimStart(new[] { '/' });
+                                        <li>
+                                            @if (!String.IsNullOrEmpty(ff))
+                                            {
+                                                <a href="@Href("~/Admin/Editor/Index?fileToEdit=" + @ff + "/" + @f.Name + "&theme=" + theme)"><strong class="text-capitalize text-muted">@ff/</strong>@f.Name</a>
+                                            }
+                                            else
+                                            {
+                                                <a href="@Href("~/Admin/Editor/Index?fileToEdit=" + @f.Name + "&theme=" + theme)">@f.Name</a>
+                                            }
+                                        </li>
+                                    }
+                                }
+
+                            </ul>
+
+                            <h4>Styles</h4>
+                            <ul>
+                                @if (fileInfoCSS != null)
+                                {
+                                    foreach (var f in fileInfoCSS)
+                                    {
+
+                                        var ff = f.Directory.ToString();
+                                        ff = ff.Replace(Server.MapPath(Themes.ThemeDirectory + "/" + theme), "");
+                                        ff = ff.Replace("\\", "/").TrimStart(new[] { '/' });
+
+                                        <li>
+                                            @if (!String.IsNullOrEmpty(ff))
+                                            {
+                                                <a href="@Href("~/Admin/Editor/Index?fileToEdit=" + @ff + "/" + @f.Name + "&theme=" + theme)"><strong class="text-capitalize text-muted">@ff/</strong>@f.Name</a>
+                                            }
+                                            else
+                                            {
+                                                <a href="@Href("~/Admin/Editor/Index/?fileToEdit=" + @f.Name + "&theme=" + theme)">@f.Name</a>
+                                            }
+
+
+                                        </li>
+                                    }
+                                }
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+
+
+        </div>
+    }}
+
+<script type="text/javascript">
+    var cls = $('.alert');
+    cls.delay(3000).fadeOut();
+</script>

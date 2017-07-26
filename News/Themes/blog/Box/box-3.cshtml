@@ -1,0 +1,40 @@
+﻿@using News.Models;
+@using News.Data;
+@{
+    var category_name = "tan-man";    
+}
+<!-- box-3 start-->
+<div class="col-sm-16 wow fadeInUp animated " data-wow-delay="0.5s" data-wow-offset="100">
+    <div class="main-title-outer pull-left">
+        <div class="main-title">@Html.Raw(BlogHelper.GetCategoryName(category_name))</div>        
+    </div>
+    <div class="row">
+        <div id="owl-lifestyle" class="owl-carousel owl-theme lifestyle pull-left">            
+            @{
+                var posts = BlogService.GetPostsByCategory(slug: category_name, take: 7);
+
+                if (posts != null)
+                {
+                    foreach (var item in posts)
+                    {
+                        <div class="item topic">
+                            <a href="~/blog/@Html.Raw(item.Name)">
+                                <img class="img-thumbnail" src="~/thumbnail/@item.PostID?size=300x132" alt="@item.Title" />
+
+                                <h4>@Html.Raw(item.Title)</h4>
+                                <div class="text-danger sub-info-bordered remove-borders">
+                                    <div class="time"><span class="ion-android-data icon"></span>@Html.Raw(Convert.ToDateTime(item.Created).ToString("dd MMM yyyy"))</div>
+                                    <div class="comments">
+                                        <span class="ion-chatbubbles icon"></span>
+                                        <span class="fb-comments-count" data-href="http://@Request.Url.Authority/blog/@item.Name"></span>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                }
+            }
+        </div>
+    </div>    
+</div>
+<!-- box-3 end -->  

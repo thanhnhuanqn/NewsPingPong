@@ -1,0 +1,104 @@
+﻿@model News.Data.Users
+@using Santhos.Web.Mvc.BootstrapFlashMessages
+@using News.Data
+@using News.Areas.Admin.Models;
+
+@{
+
+    ViewBag.Title = "Create an account";
+   
+    //roles
+
+    var roles = RoleModel.GetAllRoles();
+}
+<div class="row">
+    
+    <div class="col-md-12">
+        <h3 id="add-new-user">Add New User</h3>
+        <p class="description">Create a brand new user and add them to this site.</p>
+        <br />
+        <div class="col-lg-12">
+            @Html.FlashMessages(true)
+        </div>
+        <form method="post" class="form-horizontal" action="~/admin/user/create">
+            @AntiForgery.GetHtml()
+            <input type="hidden" value="new" name="form-register" />
+            @Html.ValidationSummary(true)
+
+            <div class="form-group">
+                <label for="username" class="col-md-3">Username (required)</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="text" id="username" name="username" value="@Request["username"]" />
+                    @Html.ValidationMessage("username")
+                </div>
+            </div>
+            <br />
+
+            <div class="form-group">
+                <label for="email" class="col-md-3">E-mail (required)</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="text" id="email" name="email" value="@Request["email"]" />
+                    @Html.ValidationMessage("email")
+                </div>
+            </div>
+            <br />
+            <div class="form-group">
+                <label for="firstname" class="col-md-3">First Name</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="text" id="firstname" name="firstname" value="@Request["firstname"]" />
+                    @Html.ValidationMessage("firstname")
+                </div>
+            </div>
+            <br />
+            <div class="form-group">
+                <label for="lastname" class="col-md-3">Last Name</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="text" id="lastname" name="lastname" value="@Request["lastname"]" />
+                    @Html.ValidationMessage("lastname")
+                </div>
+            </div>
+            <br />
+            <div class="form-group">
+                <label for="lastname" class="col-md-3">Website</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="text" id="website" name="website" value="@Request["website"]" />
+                    @Html.ValidationMessage("website")
+                </div>
+            </div>
+            <br />
+            <div class="form-group">
+                <label for="password" class="col-md-3">Password (required)</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="password" id="password" name="password" />
+                    @Html.ValidationMessage("password")
+                </div>
+            </div>
+            <br />
+            <div class="form-group">
+                <label for="password2" class="col-md-3">Repeat Password (required)</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="password" id="password2" name="password2" value="" />
+                </div>
+            </div>
+            <br />
+            <div class="form-group">
+                <label for="role" class="col-md-3">Role</label>
+                <div class="col-md-2">
+                    <select name="role" class="form-control">
+                        @foreach (var itemRole in roles)
+                        {
+                            <option>@itemRole.RoleName</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <br />
+
+            <div class="form-group">
+                <div class="col-md-3">
+                    <input class="btn btn-primary" type="submit" name="Submit" value="Register" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

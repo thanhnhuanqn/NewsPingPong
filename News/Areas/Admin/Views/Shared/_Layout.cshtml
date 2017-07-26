@@ -1,0 +1,43 @@
+﻿@using News.Areas.Admin.Models;
+@{
+    SecurityModel.RequireAuthenticatedUser();
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta content="width=device-width,initial-scale=1.0" name="viewport" />
+    <title>@ViewBag.Title</title>
+    <meta charset="utf-8" />     
+    <link href="~/Content/reset.css" rel="stylesheet" />
+    @Styles.Render("~/Content/AdminBootstrap")
+    <link href="~/Content/css/bootstrap-3.3.4.css" rel="stylesheet" />
+    <link href="~/Content/admin.css" rel="stylesheet" />
+    <link href="~/Content/dashicons.css" rel="stylesheet" />        
+    <script src="~/Scripts/jquery-2.2.3.js"></script>
+    <script src="~/Content/js/bootstrap.js"></script>    
+</head>
+<body>    
+    <div id="adminmenuback"></div>
+    <div id="wrapper">
+        @RenderPage("~/Areas/Admin/Views/Shared/Partials/_AdminMenuTop.cshtml")
+        <div id="page-wrapper">
+            <div class="container-fluid">
+                @RenderBody()
+            </div>
+            <div class="container-fluid">
+                @RenderPage("~/Areas/Admin/Views/Shared/Partials/_AdminFooter.cshtml")
+            </div>
+        </div>
+    </div>
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+    <script src="~/Scripts/jquery-1.10.2.intellisense.js"></script>
+    @RenderSection("scripts", required: false)
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.alert-dismissible').fadeOut(5000);
+        });
+    </script>
+</body>
+</html>
+

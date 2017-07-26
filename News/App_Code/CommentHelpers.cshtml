@@ -1,0 +1,44 @@
+﻿@helper DisplaySearchComment(string typeName, string typeSearch)
+{
+    <div class="col-lg-12">
+        <div class="tablenav">
+            <div class="pull-left">
+                <h3>@typeName</h3>
+            </div>
+            <div class="pull-right">
+                <div class="top">
+                    <div class="form-inline">
+                        @FromSearch(typeSearch)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@helper FromSearch(dynamic text)
+{
+    <form method="get">
+        <div class="form-group input-group">
+            <input class="form-control input-sm" type="text" placeholder="Enter @text title" name="search" value="@Request["search"]">
+            <span class="input-group-btn">
+                <button class="btn btn-default btn-sm" type="submit"><i class="glyphicon glyphicon-search"></i> Search @text</button>
+            </span>
+        </div>
+    </form>
+}
+
+@helper DisplayRowAction(int comment_id, dynamic comment_approved)
+{
+    <div class="row-actions">
+        @if (comment_approved == "1")
+        {
+            <span class="unapprove"><a href="~/admin/comment/unapprove/@comment_id" title="Unapprove this comment">Chờ Duyệt</a></span>
+        }
+        else
+        {
+            <span class="approve"><a href="~/admin/comment/approve/@comment_id" title="Approve this comment">Chấp Nhận</a></span>
+        }
+        <span class="edit"> | <a href="~/admin/comment/edit/@comment_id" title="Edit comment">Sửa</a></span>
+        <span class="trash"> | <a href="~/admin/comment/delete/@comment_id" class="delete" title="Delele comment">Xoá</a></span>
+    </div>
+}

@@ -1,0 +1,30 @@
+﻿@{
+    int numberComment = Model;
+    
+    dynamic posts = SiteQuery.get_all_comments(top: numberComment);
+    if (posts != null)
+    {
+        int i = 0;
+        foreach (var item in posts)
+        {
+            if (i > numberComment)
+            {
+                break;
+            }
+            <li>
+                <a href="#">
+                    <div class="row">
+                        <div class="col-sm-5  col-md-4 ">
+                            <img class="img-thumbnail pull-left" src="@Page.ThemePath/images/comments/com-1.jpg" width="164" height="152" alt="@item.post_title" />
+                        </div>
+                        <div class="col-sm-11  col-md-12 ">
+                            <h4>@item.comment_author</h4>
+                            <p>@Convert.ToString(item.comment_content)</p>
+                        </div>
+                    </div>
+                </a>
+            </li>
+            i++;
+        }
+    } 
+}

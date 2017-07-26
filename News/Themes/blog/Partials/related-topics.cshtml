@@ -1,0 +1,41 @@
+﻿@using News.Models;
+@using News.Data;
+
+<div class="col-sm-16 related">
+    <div class="main-title-outer pull-left">
+        <div class="main-title">Cùng chủ đề</div>
+    </div>
+    <div class="row">
+        @{
+            var category = Model.Category;
+
+            var post_name = Model.Name;
+
+            if (category != null && post_name != null)
+            {
+                var posts = BlogService.GetPostsByCategory(category, 3, post_name);
+
+                if (posts != null)
+                {
+                    foreach (var post in posts)
+                    {
+                        <div class="item topic col-sm-5 col-xs-16">
+                            <a href="~/blog/@post.Name">
+                                <img width="274" height="121" alt="@post.Title" src="~/thumbnail/@post.PostID?size=274x121" class="img-thumbnail">
+                                <h4>@post.Title</h4>
+                                <div class="text-danger sub-info-bordered remove-borders">
+                                    <div class="time"><span class="ion-android-data icon"></span>@Convert.ToDateTime(post.Created).ToString("dd MMM yyyy")</div>
+                                    <div class="comments">
+                                        <span class="ion-chatbubbles icon"></span>
+                                        <span class="fb-comments-count" data-href="http://@Request.Url.Authority/blog/@post.Name"></span>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                }
+            }
+        }
+    </div>
+</div>
+

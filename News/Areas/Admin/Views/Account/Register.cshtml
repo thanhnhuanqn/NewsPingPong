@@ -1,0 +1,173 @@
+﻿@{
+
+    Page.Title = "Create an account";
+    //Layout = "~/Shared/Layouts/_AdminLayout.cshtml";
+
+    var username = Request["username"];
+
+    var email = Request["email"];
+
+    var firstname = Request["firstname"];
+
+    var lastname = Request["lastname"];
+
+    var website = Request["website"];
+
+
+    var password = Request["password"];
+    var password2 = Request["password2"];
+
+    var role = Request["role"];
+
+    var isRegister = Request["form-register"];
+
+    if (IsPost && !isRegister.IsEmpty())
+    {
+        if (firstname.IsEmpty())
+        {
+            ModelState.AddError("firstname", "Please provide a first name");
+        }
+        if (lastname.IsEmpty())
+        {
+            ModelState.AddError("lastname", "Please provide a last name");
+        }
+        if (username.IsEmpty())
+        {
+            ModelState.AddError("username", "You must provide a user name");
+        }
+        if (password.IsEmpty())
+        {
+            ModelState.AddError("password", "You must provide a password");
+        }
+        if (password2 != password)
+        {
+            ModelState.AddError("email2", "Your email addresses must match");
+        }
+        if (email.IsEmpty())
+        {
+            ModelState.AddError("email", "Please provide your email address");
+        }
+
+        if (!Request["email"].IsEmpty() && !Functions.IsValidEmail(Request["Email"]))
+        {
+            ModelState.AddError("email", "Please provide a valid email address");
+        }
+
+        if (!ModelState.IsValid)
+        {
+            ModelState.AddFormError(@"Please fix the errors below before resubmitting the form");
+        }
+        else
+        {
+            var user = new { FirstName = firstname, LastName = lastname, Email = email, Website = website, Role = role };
+            try
+            {
+                var hostUrl = Request.Url.GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped);
+                UserRepository.Create(username, password, firstname, lastname, email, website, role, hostUrl);
+            }
+            catch (MembershipCreateUserException ex)
+            {
+                if (ex.StatusCode == MembershipCreateStatus.DuplicateUserName)
+                {
+                    ModelState.AddError("username", "That user name is already in use. Please choose another.");
+                    ModelState.AddFormError(@"Please fix the errors below before resubmitting the form");
+                }
+                else
+                {
+                    ModelState.AddFormError("Something went wrong. Please try again");
+                }
+            }
+        }
+
+    }
+    //roles
+
+    var roles = RoleRepository.GetAllRoles();
+}
+<link href="~/Content/admin.css" rel="stylesheet" />
+
+<div class="col-md-10">
+    <h2 id="add-new-user"> Add New User</h2>
+    <p>Create a brand new user and add them to this site.</p>
+    <br />
+    <form method="post" class="form-horizontal">
+        @AntiForgery.GetHtml()
+        <input type="hidden" value="new" name="form-register" />
+        @Html.ValidationSummary(true)
+
+        <div class="form-group">
+            <label for="username" class="col-md-3">Username (required)</label>
+            <div class="col-md-4">
+                <input class="form-control" type="text" id="username" name="username" value="@username" />
+                @Html.ValidationMessage("username")
+            </div>
+        </div>
+        <br />
+
+        <div class="form-group">
+            <label for="email" class="col-md-3">E-mail (required)</label>
+            <div class="col-md-4">
+                <input class="form-control" type="text" id="email" name="email" value="@email" />
+                @Html.ValidationMessage("email")
+            </div>
+        </div>
+        <br />
+        <div class="form-group">
+            <label for="firstname" class="col-md-3">First Name</label>
+            <div class="col-md-4">
+                <input class="form-control" type="text" id="firstname" name="firstname" value="@firstname" />
+                @Html.ValidationMessage("firstname")
+            </div>
+        </div>
+        <br />
+        <div class="form-group">
+            <label for="lastname" class="col-md-3">Last Name</label>
+            <div class="col-md-4">
+                <input class="form-control" type="text" id="lastname" name="lastname" value="@lastname" />
+                @Html.ValidationMessage("lastname")
+            </div>
+        </div>
+        <br />
+        <div class="form-group">
+            <label for="lastname" class="col-md-3">Website</label>
+            <div class="col-md-4">
+                <input class="form-control" type="text" id="website" name="website" value="@website" />
+                @Html.ValidationMessage("website")
+            </div>
+        </div>
+        <br />
+        <div class="form-group">
+            <label for="password" class="col-md-3">Password (required)</label>
+            <div class="col-md-4">
+                <input class="form-control" type="password" id="password" name="password" />
+                @Html.ValidationMessage("password")
+            </div>
+        </div>
+        <br />
+        <div class="form-group">
+            <label for="password2" class="col-md-3">Repeat Password (required)</label>
+            <div class="col-md-4">
+                <input class="form-control" type="password" id="password2" name="password2" value="" />
+            </div>
+        </div>
+        <br />
+        <div class="form-group">
+            <label for="role" class="col-md-3">Role</label>
+            <div class="col-md-2">
+                <select name="role" class="form-control">
+                    @foreach (var itemRole in roles)
+                    {
+                        <option>@itemRole</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <br />
+
+        <div class="form-group">
+            <div class="col-md-3">
+                <input class="btn btn-primary" type="submit" name="Submit" value="Register" />
+            </div>
+        </div>
+    </form>
+</div>

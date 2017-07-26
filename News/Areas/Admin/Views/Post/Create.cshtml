@@ -1,0 +1,179 @@
+﻿@model News.Data.Posts
+@using News.Areas.Admin.Models
+
+@using Santhos.Web.Mvc.BootstrapFlashMessages
+
+@{
+    ViewBag.Title = "New post";
+    //set date post
+    int month = DateTime.Now.Month;
+    int day = DateTime.Now.Day;
+    int year = DateTime.Now.Year;
+
+    int hour = DateTime.Now.Hour;
+    int minutes = DateTime.Now.Minute;
+}
+<div class="row">
+    <div class="col-lg-12">
+        <h3>New Post <a href="~/Admin/Post/Create" class="btn btn-xs btn-success">Add new</a> </h3>
+    </div>
+    <div class="col-lg-12">
+        @Html.FlashMessages(true)
+    </div>
+    <form name="post" method="post" action="~/admin/post/create">
+        <div class="col-md-9">
+            @AntiForgery.GetHtml()
+            @Html.ValidationSummary(true)
+            <input id="Type" name="Type" value="post" type="hidden">
+            <input id="UserID" name="UserID" value="0" type="hidden">
+            <input id="Parent" name="Parent" value="0" type="hidden">
+            <div class="form-group">
+                <div>
+                    <label>Title</label>
+                    <input class="form-control" placeholder="Enter title here" type="text" name="Title" value="@Request["Title"]" />
+                    @Html.ValidationMessage("Title")
+                </div>
+            </div>
+            <div class="form-group ">
+                <label>Excerpt</label>
+                <div>
+                    <textarea class="form-control" name="Excerpt">@Request["Excerpt"]</textarea>
+                    @Html.ValidationMessage("Excerpt")
+                </div>
+            </div>
+            <div class="form-group ">
+                <label>Content</label>
+                <div>
+                    <textarea id="Content" class="form-control" name="Content" >@Request["Content"]</textarea>
+                    @Html.ValidationMessage("Content")
+                </div>
+
+            </div>
+            <div class="form-group ">
+                <label>Slug</label>
+                <div>
+                    <input class="form-control" type="text" name="Name" value="@Request["Name"]" placeholder="Auto-generate from title" />
+                    @Html.ValidationMessage("Name")
+                </div>
+            </div>
+
+            <div class="form-group ">
+                <label>Keyword</label>
+                <div>
+                    <input class="form-control" type="text" name="keyword" value="@Request["keyword"]" />
+                    @Html.ValidationMessage("keyword")
+                </div>
+            </div>
+
+            <div class="form-group ">
+                <label>Description</label>
+                <div>
+                    <textarea class="form-control" name="description">@Request["description"]</textarea>
+                    @Html.ValidationMessage("description")
+                </div>
+            </div>
+
+
+            <div class="form-group ">
+                <label></label>
+                <div>
+                    <input class="btn btn-primary" type="submit" value="Create" />
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="accordion-container">
+                <h4>Publish</h4>
+                <div id="sticky-span">
+                    <input id="sticky" name="sticky" type="checkbox" value="sticky">
+                    <label for="sticky" class="selectit">Stick this post</label><br>
+                </div>
+                <div id="statusPost" class="form-group">
+                    <label for="post_status">Visibility</label>
+                    @PostHelpers.SelectStatus()
+                </div>
+                <div id="visibilityPost" class="form-group">
+                    <label>Publish</label>
+                    <div>
+                        @PostHelpers.DisplayMonth(month)
+                        <input type="text" value="@day" name="dd" style="width:20px;" />,
+                        <input type="text" value="@year" name="yy" style="width:35px;" /> @@
+                        <input type="text" value="@hour" name="hh" style="width:20px;" /> :
+                        <input type="text" value="@minutes" name="mi" style="width:20px;" />
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-container">
+                <div class="form-group">
+                    <h4>Categories</h4>
+                    @PostHelpers.DisplayMenuPost(ViewBag.Categories)
+                    @Html.ValidationMessage("Categories")
+                </div>
+            </div>
+            <div class="accordion-container">
+                <div class="form">
+                    <h4>Tags</h4>
+                    <input type="text" name="tags" class="form-control" autocomplete="off" value="">
+                    <p class="description">Separate tags with commas</p>
+                </div>
+            </div>
+
+            <div class="accordion-container">
+                <div class="form">
+                    <h4>Featured Image</h4>
+                    @{ object data = PostModel.GetAll("attachment"); }
+                    @Html.Partial("~/Areas/Admin/Views/Post/_featuredImage.cshtml", data)
+                    <div id="imageDaChon" class="thumbnail">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="~/Scripts/gepapixel.js"></script>
+    <script src="~/Scripts/ckeditor/ckeditor.js"></script>
+    <script src="~/Scripts/ckfinder/ckfinder.js"></script>
+
+
+    <script type="text/javascript">
+        $(function () {
+            $('.chooseimage').click(function (e) {
+                e.preventDefault();
+                $('div').removeClass('choose-image-border');
+
+                $('img').removeClass('chon-hinh-nay');
+
+                var id = "#image-" + $(this).attr("id");
+                $(id).addClass("choose-image-border");
+                $(this).addClass("chon-hinh-nay");
+            });
+
+            $('.chooseimage').dblclick(function (e) {
+                e.preventDefault();
+                var t = $('.chon-hinh-nay').attr("alt");
+                var file = '<img alt = "' + t + '" src="/uploads/medium/' + t + '"/>';
+
+                file += '<input type = "hidden" name="image-choose" value = "' + $('.chon-hinh-nay').attr("id") + '"/>';
+
+                $('#imageDaChon').html(file);
+            });
+
+
+            $('#get_image_file_path').click(function (e) {
+                e.preventDefault();
+                var t = $('.chon-hinh-nay').attr("alt");
+                var file = '<img alt = "' + t + '" src="/uploads/medium/' + t + '"/>';
+
+                file += '<input type = "hidden" name="image-choose" value = "' + $('.chon-hinh-nay').attr("id") + '"/>';
+
+                $('#imageDaChon').html(file);
+            });
+
+        })
+    </script>
+}
+

@@ -1,0 +1,46 @@
+﻿@using News.Areas.Admin.Models;
+@{
+    var action = Model;
+    var category = TermModel.Get(action);
+    var product = PostModel.Get(action);
+    if (category != null)
+    {
+        if (category.CategoryType == "category")
+        {
+            <div class="breadcrumbs bg_grey_light_2 fs_medium fw_light">                
+                    <a href="/" class="sc_hover">Trang chủ</a> <span class="color_dark">/</span>
+                    <span class="color_light">@category.CategoryName</span>                
+            </div>
+        }
+    }
+    if (product != null)
+    {
+        var categoryType = PostModel.GetCategory(product.Name, "category");
+
+        var prefix = string.Empty;
+     
+        if (product.Type == "post")
+        {
+            prefix = "c";
+            categoryType = PostModel.GetCategory(product.Name, "category");
+        }
+
+        if (product.Type == "page")
+        {
+            prefix = "page";
+            <div class="breadcrumbs bg_grey_light_2 fs_medium fw_light">                
+                    <a href="/" class="sc_hover">Trang chủ</a> <span class="color_dark">/</span>
+                    <span class="color_light">@Html.Raw(product.Title)</span>                
+            </div>
+        }
+
+        if (prefix != string.Empty && categoryType != null)
+        {
+            <div class="breadcrumbs bg_grey_light_2 fs_medium fw_light">
+                    <a href="/" class="sc_hover">Trang chủ</a> <span class="color_dark">/</span>
+                    <a href="~/@prefix/@categoryType.Slug" class="sc_hover">@Html.Raw(categoryType.CategoryName)</a>                
+            </div>
+        }
+
+    }
+}

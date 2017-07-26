@@ -1,0 +1,19 @@
+﻿@{
+    Page.Title = "Thanks for registering";
+    Layout = "~/Shared/Layouts/_SiteLayout.cshtml";
+}
+
+<div>
+    
+<h2>Thanks</h2>
+@if (!WebSecurity.IsAuthenticated) {
+    <p>
+        An email with instructions on how to activate
+        your account has been sent to you.
+    </p>
+} else {
+    <p>
+        Please use the navigation to find your way around.
+    </p>
+}
+</div>

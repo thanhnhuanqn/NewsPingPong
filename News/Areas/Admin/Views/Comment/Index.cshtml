@@ -1,0 +1,102 @@
+﻿@model IEnumerable<News.Data.Comments>
+@using News.Areas.Admin.Models
+@using Santhos.Web.Mvc.BootstrapFlashMessages
+
+@{
+    
+    ViewBag.Title = "Comments";
+    //for list post
+    var search = Request["search"];
+    var comments = ViewBag.Comments;
+
+
+    dynamic post = null;
+    string title = "Comments";
+
+    if (Request.QueryString["p"] != null)
+    {
+
+        comments = CommentModel.GetAll(orderby: " DateCreated", postid: Request.QueryString["p"].AsInt());
+
+        post = PostModel.Get(Request.QueryString["p"].AsInt());
+
+        if (!search.IsEmpty())
+        {
+            comments = CommentModel.GetAll(orderby: "DateCreated", postid: Request.QueryString["p"].AsInt(), search: search);
+        }
+    }
+
+    var grid = new WebGrid(source: comments, rowsPerPage: 10);
+
+    if (post != null)
+    {
+        title = "Các comment của <a href=\"post/edit/" + post.Name + "\">“" + post.Title + "”</a>";
+    }
+    else
+    {
+        title = "Comments";
+    }
+}
+<div class="row">
+    @CommentHelpers.DisplaySearchComment(title, "comment")
+    <div class="col-lg-12">
+        @Html.FlashMessages(true)
+    </div>
+    <div class="col-lg-12">
+        <form method="post" action="~/admin/comment/DeleteList">
+            @AntiForgery.GetHtml()
+            <div class="tablenav">
+                <div class="pull-left">
+                    <div class="dropdown">
+                        <button class="btn btn-default btn-sm" type="button" id="dd-menu" data-toggle="dropdown">
+                            Action <span class="caret"></span>
+                        </button>
+                        <div class="dropdown-menu" role="menu">
+                            <div role="presentation">
+                                <a href="~/admin/comment/unapprove" class="btn btn-link">
+                                    <span class="glyphicon glyphicon-plus"></span> Unapprove
+                                </a>
+
+                                <a href="~/admin/comment/approve" class="btn btn-link">
+                                    <span class="glyphicon glyphicon-arrow-down"></span> Approve
+                                </a>
+
+                                <a href="~/admin/comment/spam" class="btn btn-link">
+                                    <span class="glyphicon glyphicon-bullhorn"></span> Spam
+                                </a>
+
+                                <button class="btn btn-link" type="submit" value="btnDelAll" id="deleteActionRun" role="menuitem" tabindex="-1">
+                                    <span class="glyphicon glyphicon-remove"></span> Delete
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="pull-right">
+                    <p class="description">Have all @PostHelpers.CountItems(grid.TotalRowCount)</p>
+                </div>
+            </div>
+
+            @{
+
+                @grid.GetHtml(tableStyle: "table table-hover widefat",
+                    columns:
+                        grid.Columns(
+                                    grid.Column(format: @<input type="checkbox" name="actionDelete" value="@item.CommentID" />, style: "check-column"),
+                                    grid.Column(format: @<text><strong>@item.AuthorName</strong><br /><a href="mailto:@item.AuthorEmail">@item.AuthorEmail</a></text>, columnName: "AuthorName", header: "Author"),
+                                    grid.Column(format: @<text><div class="submitted-on">Ngày @Convert.ToDateTime(item.DateCreated).ToString("dd/MM/yyyy lúc hh:mm tt")<br /></div>@Html.Raw(item.CommentContent) @CommentHelpers.DisplayRowAction((int)item.CommentID, item.Approved)</text>, header: "Content", columnName: "Content")
+                                                                                                                                                ),
+                                                                                                                                                firstText: "First",
+                                                                                                                                                lastText: "Last",
+                                                                                                                                                nextText: "Next",
+                                                                                                                                                previousText: "Previous",
+                                                                                                                                                mode: WebGridPagerModes.All
+                                                                                                                                                )
+            }
+        </form>
+    </div>
+</div>
+@section Scripts{
+    <script src="~/Scripts/gepapixel.js"></script>
+}

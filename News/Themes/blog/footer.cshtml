@@ -1,0 +1,36 @@
+﻿@using News.Models;
+@using News.Data;
+@using News.Areas.Admin.Models;
+<!-- Footer Start -->
+<footer>
+    <div class="top-sec">
+        <div class="container ">
+            <div class="row match-height-container">
+                <div class="col-sm-16 popular-tags  wow fadeInDown animated" data-wow-delay="1s" data-wow-offset="40">
+                    <div class="f-title">Xu hướng</div>
+                    <ul class="tags list-unstyled pull-left">
+                        @foreach (view_GetAllTagHavePost tag in BlogService.GetAllTag(20))
+                        {
+                            <li><a href="~/xuhuong/@tag.Slug">@tag.CategoryName</a></li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="btm-sec">
+        <div class="container">
+          
+                
+                <div class="col-sm-16 f-social  wow fadeInDown animated" data-wow-delay="1s" data-wow-offset="10">
+                    <ul class="list-inline">
+                        <li> <a href="#"><span class="ion-social-twitter"></span></a> </li>
+                        <li> <a href="#"><span class="ion-social-facebook"></span></a> </li>
+                        <li> <a href="#"><span class="ion-social-instagram"></span></a> </li>
+                    </ul>
+                </div>
+            
+        </div>
+    </div>
+</footer>
+<!-- Footer end -->

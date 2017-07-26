@@ -1,0 +1,23 @@
+﻿@using News.Areas.Admin.Models
+@using News.Data
+@RenderPage(Functions.GetFilePath("Blog"), ViewBag.Post)
+@if (ViewBag.Post != null)
+{    
+    @section MetaPost{
+    <meta name="robots" content="index,follow" />
+    <meta itemprop="datePublished" content="@Convert.ToDateTime(ViewBag.Post.Created).ToString("dd/MM/yyyy hh:mm:ss")" />
+    <meta itemprop="dateModified" content="@Convert.ToDateTime(ViewBag.Post.Modified).ToString("dd/MM/yyyy hh:mm:ss")" />
+    <meta itemprop="name" content="@ViewBag.Post.Title" />
+    <meta name="author" content="news.tinthanhsg.com" />
+    <meta property="article:publisher" content="https://www.facebook.com/portfolio.namlong" />    
+    <meta property="og:locale" content="vi_VN" />
+    <meta property="og:site_name" content="@OptionModel.BlogName" />
+    <meta property="og:url" content="@Request.Url" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="@ViewBag.Post.Title" />
+    <meta property="og:description" content="@ViewBag.Post.Excerpt" />
+    <meta property="og:image" content="http://@Request.Url.Authority/thumbnail/@ViewBag.Post.PostID?size=1024x768" />
+    <link rel="alternate" hreflang="vi" href="@Request.Url" />
+    <link rel="original-source" href="@Request.Url" />
+    }
+}

@@ -1,0 +1,85 @@
+﻿@{
+    Validation.RequireField("captcha", "Vui lòng nhập mã bảo vệ");
+    Validation.RequireField("author", "Tên đang bị bỏ trống");
+    Validation.RequireField("email", "Email chưa có");
+    Validation.RequireField("comment", "Bạn chưa nhập nội dung");
+
+    var comment_post_ID = Model;
+
+    string author = "", email = "", url = "", id = "0";
+
+    if (Request.Cookies["author"] != null)
+    {
+        author = Request.Cookies["author"].Value;
+    }
+    if (Request.Cookies["author_email"] != null)
+    {
+        email = Request.Cookies["author_email"].Value;
+    }
+    if (Request.Cookies["author_url"] != null)
+    {
+        url = Request.Cookies["author_url"].Value;
+    }
+    if (Request.Cookies["user_id"] != null)
+    {
+        id = Request.Cookies["user_id"].Value;
+    }
+    if (IsPost)
+    {
+        if (Request["comment"].IsEmpty())
+        {
+            ModelState.AddError("comment", "The comment field is required");
+        }
+    }
+}
+<div id="respond" class="comment-respond">
+    <form action="~/comments/Index" method="post" id="commentform" class="comment-form form-group" novalidate="">
+        @AntiForgery.GetHtml()
+        @Html.ValidationSummary(true)
+        <p class="comment-notes">
+            <span id="email-notes">Your email address will not be published.</span> Required fields are marked
+            <span class="required">*</span>
+        </p>
+
+        <div class="row">
+            <p class="comment-form-author col-lg-5">
+                <label for="author">Name <span class="required">*</span></label>
+                <input id="author" class="form-control" @Validation.For("author") name="author" value="@author" size="30" aria-required="true" required="required" type="text">
+                @Html.ValidationMessage("author")
+            </p>
+            <p class="comment-form-email col-lg-5">
+                <label for="email">Email <span class="required">*</span></label>
+                <input id="email" class="form-control" @Validation.For("email") name="email" value="@email" size="30" aria-describedby="email-notes" aria-required="true" required="required" type="email">
+                @Html.ValidationMessage("email")
+            </p>
+            <p class="comment-form-url col-lg-5">
+                <label for="url">Website</label>
+                <input id="url" class="form-control" name="url" value="@url" size="30" type="url">
+            </p>
+        </div>
+
+        <div class="clear-fix"></div><br />
+        <p class="comment-form-comment">
+            <label for="comment">Comment</label>
+            <textarea id="comment" class="form-control" @Validation.For("comment") name="comment" cols="45" rows="8" aria-describedby="form-allowed-tags" aria-required="true" required="required"></textarea>
+            @Html.ValidationMessage("comment")
+        </p>
+        <p class="clear-fix" id="captcha-code">
+            <div class="form-inline">
+                <div class="form-group">
+                    <div class="input-group">
+                        <label for="captcha">You see ? </label>
+                        <img src="~/captcha" alt="captcha code" />
+                        <input id="captcha" class="input-sm" name="captcha" @Validation.For("captcha") size="10" value="" type="text">
+                    </div>
+                </div>
+            </div>
+            @Html.ValidationMessage("captcha")
+        </p>
+        <p class="form-submit">
+            <input name="submit" id="submit" class="btn btn-primary" value="Post Comment" type="submit">
+            <input name="comment_post_ID" value="@comment_post_ID" id="comment_post_ID" type="hidden">
+            <input name="comment_parent" id="comment_parent" value="@id" type="hidden">
+        </p>
+    </form>
+</div>

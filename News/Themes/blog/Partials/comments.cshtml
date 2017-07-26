@@ -1,0 +1,57 @@
+﻿@using News.Models;
+@using News.Data;
+@using News.Areas.Admin.Models;
+
+@{
+    var post = (Posts)Model;
+    int page = Request.QueryString["page"] != null ? Request.QueryString["page"].AsInt() : 1;    
+    
+    var comments = QueryModel.GetComments(PostID: post.PostID);
+
+    //var grid = new WebGrid(source: comments, rowsPerPage: 10);
+    int perPage = 10;
+    
+    var grid = new WebGrid(null,
+        defaultSort: "",
+        rowsPerPage: perPage,
+        selectionFieldName:"SearchString",
+        ajaxUpdateContainerId:"agrid",
+        sortFieldName:"SortColumn",
+        sortDirectionFieldName:"SortOrder");
+        grid.Bind(comments, autoSortAndPage: true, rowCount: comments.Count());
+
+    if (grid != null)
+    {
+        <div class="col-sm-16 comments-area">
+            <div class="main-title-outer pull-left">
+                <div class="main-title">comments <span class="badge badge-info">@grid.TotalRowCount</span></div>
+            </div>
+            <div class="opinion pull-left">
+                @foreach (var c in grid.Rows)
+                {
+                    var comment = (Comments)c.Value;
+                    <div class="media">
+                        <a href="#" class="pull-left"> 
+                            @Gravatar.GetHtml(email: comment.AuthorEmail, attributes: new { @class = "media-object", data_src = "holder.js/64x64", alt = "64x64" })                            
+                        </a>
+                        <div class="media-body">
+                            <div>
+                                <h4 class="media-heading">@comment.AuthorName</h4>
+                                <div class="time text-danger"><span class="ion-android-data icon"></span>@Convert.ToDateTime(comment.DateCreated).ToString("dd MMM yyyy")</div>
+                            </div>
+                            <div class="comment-body">
+                                @comment.CommentContent
+                            </div>
+                            <div class="col-sm-16"><a href="#"><span class="reply pull-right ion-ios7-compose"></span></a></div>
+                        </div>
+                    </div>
+                }        
+                @if (grid.TotalRowCount > perPage) { 
+                @grid.PagerList(WebGridPagerModes.All, paginationStyle: "pagination pagination-small pagination-right")
+                }
+            </div>
+        </div>
+    }
+}
+
+

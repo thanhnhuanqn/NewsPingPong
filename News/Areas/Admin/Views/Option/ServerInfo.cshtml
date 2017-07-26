@@ -1,0 +1,81 @@
+﻿@using News.Areas.Admin.Controllers.Components
+@{    
+    ViewBag.Title = "Info server";
+
+    dynamic info = new System.Dynamic.ExpandoObject();
+
+    info.Path = AppDomain.CurrentDomain.BaseDirectory;
+
+    var Server = new Microsoft.VisualBasic.Devices.Computer();
+
+    var Disk = new System.IO.DriveInfo(info.Path);
+    try
+    {
+        info.DiskFreeSpace = Util.SizeFormat((long)Disk.TotalFreeSpace);
+    }
+    catch (UnauthorizedAccessException ex)
+    {
+        info.DiskFreeSpace = ex.Message;
+    }
+    info.IpServer = System.Net.Dns.GetHostAddresses(HttpContext.Current.Request.Url.Host);
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <h3>SERVER INFO</h3>
+        <table class="table table-responsive table-hover widefat ">
+            <thead>
+                <tr>
+                    <th class="col-lg-2">CURRENT SERVER</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Path</td>
+                    <td>@info.Path</td>
+                </tr>
+                <tr>
+                    <td>Computer name </td>
+                    <td>@Server.Name</td>
+                </tr>
+                <tr>
+                    <td>Disk Free Space</td>
+                    <td>@info.DiskFreeSpace</td>
+                </tr>
+                <tr>
+                    <td>Available Physical Memory</td>
+                    <td>@Util.SizeFormat((long)Server.Info.AvailablePhysicalMemory)</td>
+                </tr>
+                <tr>
+                    <td>Available Virtual Memory</td>
+                    <td>@Util.SizeFormat((long)Server.Info.AvailableVirtualMemory)</td>
+                </tr>
+                <tr>
+                    <td>Total Physical Memory</td>
+                    <td>@Util.SizeFormat((long)Server.Info.TotalPhysicalMemory)</td>
+                </tr>
+                <tr>
+                    <td>Total Virtual Memory</td>
+                    <td>@Util.SizeFormat((long)Server.Info.TotalVirtualMemory)</td>
+                </tr>
+                <tr>
+                    <td>OS Full Name</td>
+                    <td>@Server.Info.OSFullName</td>
+                </tr>
+                <tr>
+                    <td>OS Platform</td>
+                    <td>@Server.Info.OSPlatform</td>
+                </tr>
+                <tr>
+                    <td>OS Version</td>
+                    <td>@Server.Info.OSVersion</td>
+                </tr>
+                <tr>
+                    <td>IP Server</td>
+                    <td>@info.IpServer[0].ToString()</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

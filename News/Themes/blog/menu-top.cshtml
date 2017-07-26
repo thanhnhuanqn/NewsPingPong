@@ -1,0 +1,157 @@
+﻿@using News.Areas.Admin.Models;
+@using System.Linq;
+@using News.Models;
+@using News.Data;
+@{
+    var menu_name = TermModel.Get("primary-menu");
+    
+    dynamic posts = null;
+    
+    if (menu_name != null)
+    {
+        posts = QueryModel.GetMenuItemById(menu_name.CategoryID);
+    }
+}
+
+<!-- sticky header start -->
+<div class="sticky-header">
+    <!-- header start -->
+    <div class="container header">
+        <div class="row">
+            <div class="col-sm-5 col-md-5 wow fadeInUpLeft animated">
+                <a class="navbar-brand" href="~/">@Html.Raw(OptionModel.BlogName)</a>
+            </div>
+            <div class="col-sm-11 col-md-11 hidden-xs text-right">
+                <img src="~/Themes/blog/images/ads/468-60-ad.gif" width="468" height="60" alt="" />                
+            </div>
+        </div>
+    </div>
+    <!-- header end -->
+    <!-- nav and search start -->
+    <div class="nav-search-outer">
+        <!-- nav start -->
+
+        <nav class="navbar navbar-inverse" role="navigation">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-16">
+                        <a href="javascript:;" class="toggle-search pull-right">
+                            <span class="ion-ios7-search"></span>
+                        </a>
+                        <div class="navbar-header">
+                            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse"> 
+                                <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> 
+                                <span class="icon-bar"></span> <span class="icon-bar"></span> 
+                            </button>
+                        </div>
+                        <div class="collapse navbar-collapse" id="navbar-collapse">
+                            <ul class="nav navbar-nav text-uppercase main-nav ">
+
+                                @if (posts != null){
+                                    foreach (Posts item in posts)
+                                    {
+                                        var result = MenuModel.GetOriginalItem((int)item.PostID);
+                                        var child = MenuModel.GetMenuItemChildByMenuId((int)item.PostID);
+
+                                        string class_css = "class=\"dropdown-toggle\" data-toggle=\"dropdown\"";
+                                        string class_css_child = "class=\"ion-ios7-arrow-down nav-icn\"";
+                                    
+                                        if (item.Parent == 0)
+                                        {
+                                            if (child.Count() > 0)
+                                            {
+                                                @:<li class="dropdown">
+                                            }
+                                            else
+                                            {
+                                                @:<li>
+                                                class_css = string.Empty;
+                                                class_css_child = string.Empty;
+                                            }
+                                        
+                                            if (result.type == "Category")
+                                            {
+                                                <a href="~/c/@result.slug" @Html.Raw(class_css)>@Html.Raw(item.Title)<span @Html.Raw(class_css_child)></span></a>
+                                            }
+                                            else if (result.type == "Page")
+                                            {
+                                                <a href="~/p/@result.slug" @Html.Raw(class_css)>@Html.Raw(item.Title)<span @Html.Raw(class_css_child)></span></a>
+                                            }
+                                            else
+                                            {
+                                                <a href="~/" @Html.Raw(class_css)>@item.Title<span @Html.Raw(class_css_child)></span></a>
+                                            }
+                                            if (child != null)
+                                            {
+                                                @nav_sub(posts, (int)item.PostID, 1)
+                                            }
+                                        
+                                            @:</li>
+                                        }
+                                    }
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- nav end -->
+            <!-- search start -->
+
+            <div class="search-container ">
+                <div class="container">
+                    <form action="/?search=" method="get" role="search">
+                        <input id="search-bar" name="search" placeholder="Type & Hit Enter.." autocomplete="off">
+                    </form>
+                </div>
+            </div>
+            <!-- search end -->
+        </nav>
+        <!--nav end-->
+
+    </div>
+    <!-- nav and search end-->
+</div>
+<!-- sticky header end -->
+@helper nav_sub(dynamic list_nav_item, int id, int level = 1)
+{
+    string rowPerfix = string.Empty;
+    var child = MenuModel.GetMenuItemChildByMenuId(id);
+    
+    if (child.Count() > 0)
+    {
+        @:<ul class="dropdown-menu text-capitalize" role="menu">    
+   
+        foreach (Posts cat in list_nav_item)
+        {
+            if (cat.Parent != 0 && id == cat.Parent)
+            {
+
+                dynamic result = MenuModel.GetOriginalItem((int)cat.PostID);
+                
+                for (int i = 0; i < level; i++)
+                {
+                    rowPerfix += "— ";
+                }
+                <li data-level="@level">
+                    @if (result.type == "Category")
+                    {
+                        <a href="~/c/@result.slug"><span class="ion-ios7-arrow-right nav-sub-icn"></span>@Html.Raw(cat.Title)</a>
+                    }
+                    else if (result.type == "Page")
+                    {   
+                        <a href="~/p/@result.slug"><span class="ion-ios7-arrow-right nav-sub-icn"></span>@Html.Raw(cat.Title)</a>
+                    }
+                    else
+                    {
+                        <a href="~/"><span class="ion-ios7-arrow-right nav-sub-icn"></span>@Html.Raw(cat.Title)</a>
+                    }
+                </li>
+                    level++;
+                    //đệ qui
+                    @nav_sub(list_nav_item, (int)cat.PostID, level); level = level - 1; rowPerfix = string.Empty;
+            }
+        }
+    @:</ul>
+}
+}

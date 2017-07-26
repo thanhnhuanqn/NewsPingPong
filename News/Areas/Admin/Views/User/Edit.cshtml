@@ -1,0 +1,146 @@
+﻿@model News.Data.Users
+@using Santhos.Web.Mvc.BootstrapFlashMessages
+@using News.Areas.Admin.Models
+
+@{
+
+    ViewBag.Title = "Update account";
+
+    //roles
+    var roles = RoleModel.GetAllRoles();    
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <h3 id="add-new-user">Update User</h3>
+        <p class="description">Create a brand new user and add them to this site.</p>
+        <br />
+        <form method="post" class="form-horizontal" action="~/admin/user/update">
+            @AntiForgery.GetHtml()
+            <input type="hidden" value="@Model.UserID" name="UserID" />
+            @Html.ValidationSummary(true)
+            <div class="col-lg-12">
+                @Html.FlashMessages(true)
+            </div>
+            <div class="form-group">
+                <label for="username" class="col-md-3">Username (required)</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="text" id="UserName" name="UserName" value="@Model.UserName" disabled="disabled" />
+                    @Html.ValidationMessage("UserName")
+                </div>
+            </div>
+            <br />
+
+            <div class="form-group">
+                <label for="email" class="col-md-3">E-mail (required)</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="text" id="Email" name="Email" value="@Model.Email" />
+                    @Html.ValidationMessage("Email")
+                </div>
+            </div>
+            <br />
+            <div class="form-group">
+                <label for="firstname" class="col-md-3">First Name</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="text" id="firstname" name="firstname" value="@UserModel.GetUserMeta(Model, "firstname")" />
+                    @Html.ValidationMessage("firstname")
+                </div>
+            </div>
+            <br />
+            <div class="form-group">
+                <label for="lastname" class="col-md-3">Last Name</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="text" id="lastname" name="lastname" value="@UserModel.GetUserMeta(Model, "lastname")" />
+                    @Html.ValidationMessage("lastname")
+                </div>
+            </div>            
+            <br />
+            <div class="form-group">
+                <label for="lastname" class="col-md-3">Nick Name</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="text" id="nickname" name="nickname" value="@UserModel.GetUserMeta(Model, "nickname")" />
+                    @Html.ValidationMessage("nickname")
+                </div>
+            </div>
+            <br />
+            <div class="form-group">
+                <label for="lastname" class="col-md-3">Website</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="text" id="Url" name="Url" value="@Model.Url" />
+                    @Html.ValidationMessage("Url")
+                </div>
+            </div>
+            
+            <br />
+            <h4>About Yourself</h4>
+            <div class="form-group">
+                <label for="lastname" class="col-md-3">Biographical Info</label>
+                <div class="col-md-4">
+                    <textarea class="form-control" id="description" name="description">@UserModel.GetUserMeta(Model, "description")</textarea>
+                    @Html.ValidationMessage("description")
+                    <p class="description">Share a little biographical information to fill out your profile. This may be shown publicly.</p>
+                </div>
+
+            </div>
+            <div class="form-group">
+                <label for="password-old" class="col-md-3">Password old</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="password" id="password_old" name="password_old" value="" />
+                    @Html.ValidationMessage("password_old")
+                    <p class="description">If you would like to change the password type a new one. Otherwise leave this blank.</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="password" class="col-md-3">New Password</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="password" id="password" name="password" value="" />
+                    @Html.ValidationMessage("password")
+                </div>
+            </div>
+            <br />
+            <div class="form-group">
+                <label for="password2" class="col-md-3">Repeat New Password</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="password" id="password2" name="password2" value="" />
+                </div>
+            </div>
+            <br />
+            @if (Model.UserName != "admin")
+            {
+            <div class="form-group">
+                <label for="role" class="col-md-3">Role</label>
+                <div class="col-md-2">
+                    <select name="role" class="form-control">
+                        @foreach (var itemRole in roles)
+                        {
+                            var role = RoleModel.GetRolesForUser(Model.UserName);
+
+                            if (role != null)
+                            {
+                                if (role.Equals(itemRole.RoleName))
+                                {
+                                    <option selected>@itemRole.RoleName</option>
+                                }
+                                else
+                                {
+                                    <option>@itemRole.RoleName</option>
+                                }
+                            }
+                            else
+                            {
+                                <option>@itemRole.RoleName</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+            <br />
+            }
+            <div class="form-group">
+                <div class="col-md-3">
+                    <input class="btn btn-primary" type="submit" name="Submit" value="Update" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

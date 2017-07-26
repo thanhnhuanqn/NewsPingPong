@@ -1,0 +1,37 @@
+﻿@using News.Models;
+@using News.Data;
+
+@{
+    if (Model != null)
+    {
+        var posts = BlogService.GetAllRecent(Model);
+
+        if (posts != null)
+        {
+            foreach (var item in posts)
+            {
+                <li>
+                    <a href="~/blog/@Html.Raw(item.Name)">
+                        <div class="row">
+                            <div class="col-sm-5 col-md-4">
+                                <img class="img-thumbnail pull-left" src="~/thumbnail/@item.PostID?size=164x152" alt="@Html.Raw(item.Title)" />
+                            </div>
+                            <div class="col-sm-11 col-md-12">
+                                <h4>@Html.Raw(item.Title)</h4>
+                                <div class="text-danger sub-info">
+                                    <div class="time">
+                                        <span class="ion-android-data icon"></span>@Html.Raw(Convert.ToDateTime(item.Created).ToString("dd MMM yyyy"))
+                                    </div>
+                                    <div class="comments">
+                                        <span class="ion-chatbubbles icon"></span>
+                                        <span class="fb-comments-count" data-href="http://@Request.Url.Authority/blog/@item.Name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+            }
+        }
+    }
+}

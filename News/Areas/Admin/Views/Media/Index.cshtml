@@ -1,0 +1,95 @@
+﻿@using News.Areas.Admin.Models
+@using Santhos.Web.Mvc.BootstrapFlashMessages
+@{
+    ViewBag.Title = "Media Library";    
+
+    var mode = Request["mode"] ?? "grid";
+    
+    var action = UrlData[0];
+}
+<div class="row">
+    <div class="col-lg-12">
+        <h3>Media Library <a class="btn btn-xs btn-success">Add new</a></h3>
+    </div>
+    <div class="col-lg-12">
+        <div class="media-frame-content">
+            <div class="media-toolbar wp-filter">
+                <div class="media-toolbar-secondary">
+                    <div class="view-switch media-grid-view-switch">
+                        <a href="~/admin/media/index?mode=list" class="view-list">
+                            <span class="screen-reader-text">List View</span>
+                        </a>
+                        <a href="~/admin/media/index?mode=grid" class="view-grid current">
+                            <span class="screen-reader-text">Grid View</span>
+                        </a>
+                    </div>
+                    <label class="screen-reader-text" for="media-attachment-filters">Filter by type</label>
+                    <select class="attachment-filters" id="media-attachment-filters">
+                        <option value="all">All media items</option>
+                        <option value="image">Images</option>
+                        <option value="audio">Audio</option>
+                        <option value="video">Video</option>
+                        <option value="unattached">Unattached</option>
+                    </select>
+                    <label class="screen-reader-text" for="media-attachment-date-filters">Filter by date</label>
+                    <select class="attachment-filters" id="media-attachment-date-filters">
+                        <option value="all">All dates</option>
+                        <option value="0">August 2015</option>
+                    </select>
+                    <a class="btn btn-sm btn-default" href="#">Bulk Select</a>
+                    <span class="spinner"></span>
+                    <a class="button media-button button-primary button-large  delete-selected-button hidden" href="#">Delete Selected</a>
+                </div>
+                <div class="media-toolbar-primary search-form">
+                    <label class="screen-reader-text" for="media-search-input">Search Media</label>
+                    <input class="search" id="media-search-input" placeholder="Search" type="search">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (mode != null)
+    {
+        if (mode.Equals("list"))
+        {
+            @RenderPage("~/Areas/Admin/Views/Media/_List.cshtml")       
+        }
+        else if (mode.Equals("grid"))
+        {
+            @RenderPage("~/Areas/Admin/Views/Media/_Grid.cshtml")
+        }
+    }
+
+
+
+
+</div>
+@section scripts{    
+    <script>
+        $(function () {
+            var $chk = $('<input/>').attr({ type: 'checkbox', name: 'actionDelete', id: 'select-all', value: '' });
+            $('th:first').append($chk);
+        });
+
+        $(function () {
+            $("#deleteActionRun").click(function () {
+                return confirm("Are you sure you want to delete?");
+            });
+
+            $('#select-all').click(function (event) {
+                if (this.checked) {
+                    // Iterate each checkbox
+                    $(':checkbox').each(function () {
+                        this.checked = true;
+                    });
+                }
+                if (!this.checked) {
+                    // Iterate each checkbox
+                    $(':checkbox').each(function () {
+                        this.checked = false;
+                    });
+                }
+            });
+        });
+    </script>
+}

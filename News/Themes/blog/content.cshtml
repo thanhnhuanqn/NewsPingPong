@@ -1,0 +1,103 @@
+﻿<div class="wrapper">
+    <div class="page-header">
+        <h1>@Html.Raw(SiteQuery.post.post_title)</h1>
+        <ol class="breadcrumb">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Pages</a></li>
+            <li class="active">Section Topic Details</li>
+        </ol>
+    </div>
+    <!-- bage header End -->
+    <!-- data Start -->
+    <section>
+        <div class="row ">
+            <!-- left sec Start -->
+            <div class="col-md-11 col-sm-11">
+                <div class="row">
+                    <!-- post details start -->
+                    <div class="col-sm-16">
+                        <div class="row">
+                            <div class="sec-topic col-sm-16  wow fadeInDown animated " data-wow-delay="0.5s">
+                                <div class="row">
+                                    <div class="col-sm-16">                                                                                
+                                        <img alt="" src="~/thumbnail/@SiteQuery.post.postid?size=800x300" class="img-thumbnail" />
+                                    </div>
+                                    <div class="col-sm-16 sec-info">
+                                        <div class="text-danger sub-info-bordered">
+                                            <div class="author">
+                                                <span class="ion-person icon"></span>
+                                                By: @UserRepository.GetUserNameById((int)SiteQuery.post.post_author)
+                                            </div>
+                                            <div class="time">
+                                                <span class="ion-android-data icon"></span>
+                                                @Html.Raw(Convert.ToDateTime(SiteQuery.post.post_date).ToString("dd/MM/yyyy hh:mm"))
+                                            </div>
+                                            <div class="comments">
+                                                <span class="ion-chatbubbles icon"></span>
+                                                @{
+                                                    SiteQuery.get_comments((int)SiteQuery.post.postid);
+                                                    @SiteQuery.comment_count
+                                                }
+                                            </div>                                           
+                                        </div>
+                                        <div class="content-main">
+                                            @Html.Raw(SiteQuery.post.post_content)
+                                        </div>
+                                        <hr>
+                                    </div>
+                                </div>
+                            </div>
+                            @RenderPage(Functions.GetFilePath("_comment"), SiteQuery.post)
+                            <div class="col-sm-16">
+                                <div class="main-title-outer pull-left">
+                                    <div class="main-title">leave a comment</div>
+                                </div>
+                                <div class="col-xs-16 wow zoomIn animated">
+                                    @CommentHelper.comment_form((int)SiteQuery.post.postid)
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- post details end -->
+
+                </div>
+            </div>
+            <!-- left sec End -->
+            <!-- right sec Start -->
+            <div class="col-sm-5 hidden-xs right-sec">
+                <div class="bordered">
+                    <div class="row ">
+                        <!-- activities start -->
+                        <div class="col-sm-16 bt-space wow fadeInUp animated" data-wow-delay="1s" data-wow-offset="130">                            
+                            <!-- Nav tabs -->
+                            <ul class="nav nav-tabs nav-justified " role="tablist">
+                                <li class="active"><a href="#popular" role="tab" data-toggle="tab">Cũ hơn</a></li>
+                                <li><a href="#recent" role="tab" data-toggle="tab">Quan tâm</a></li>
+                            </ul>
+
+                            <!-- Tab panes -->
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="popular">
+                                    <ul class="list-unstyled">
+                                        @RenderPage(Functions.GetFilePath("Templates/TabPopular"), 20)
+                                    </ul>
+                                </div>
+                                <div class="tab-pane" id="recent">
+                                    <ul class="list-unstyled">
+                                        @RenderPage(Functions.GetFilePath("Templates/TabRecent"), 10)
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- activities end -->
+                        <div class="col-sm-16 bt-space wow fadeInUp animated" data-wow-delay="1s" data-wow-offset="50"> <img class="img-responsive" src="~/Themes/default/images/ads/336-280-ad.gif" width="336" height="280" alt="" /> <a href="#" class="sponsored">sponsored advert</a> </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Right Sec End -->
+        </div>
+
+    </section>
+    <!-- Data End -->
+</div>

@@ -1,0 +1,40 @@
+﻿@using News.Models;
+@using News.Data;
+@using News.Areas.Admin.Models;
+@{
+    // Layout = Functions.GetFilePath("Layout/SiteLayout");    
+    try
+    {
+        Posts p = Model;
+
+        if (p != null)
+        {
+            OptionModel.TitleCurrent = p.Title;
+            var PostID = PostMetaModel.GetMetaKey(p.PostID, "_item_menu_post_parent");
+
+            if (PostID != null)
+            {
+                dynamic template = PostMetaModel.GetMetaKey(int.Parse(PostID), "page_template");
+
+                if (template != null)
+                {
+                    @RenderPage(Functions.GetFilePath("pages/" + template), p);
+                        Page.title = p.Title;
+                    }
+                }
+            }
+            else
+            {
+                Response.Redirect("/");
+            }
+        }
+        catch (Exception e)
+        {
+            @RenderPage(Functions.GetFilePath("Error/default"), e.Message)
+            Page.title = "404";
+        }
+
+    }
+
+
+

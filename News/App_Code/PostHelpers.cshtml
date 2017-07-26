@@ -1,0 +1,469 @@
+﻿@using News.Data
+@**
+    Helper display month
+*@
+@helper DisplayMonth(int monthEdit = 0, string classCss = "")
+{
+    var month = DateTime.Now.ToString("MM");
+    var selected = string.Empty;
+    var value = string.Empty;
+    <select name="mm" id="mm" class="@classCss">
+        @for (var i = 1; i <= 12; i++)
+        {
+            string name = string.Empty;
+            switch (i)
+            {
+                case 1:
+                    name = "Jan"; break;
+                case 2:
+                    name = "Feb"; break;
+                case 3:
+                    name = "Mar"; break;
+                case 4:
+                    name = "Apr"; break;
+                case 5:
+                    name = "May"; break;
+                case 6:
+                    name = "Jun"; break;
+                case 7:
+                    name = "Jul"; break;
+                case 8:
+                    name = "Aug"; break;
+                case 9:
+                    name = "Sep"; break;
+                case 10:
+                    name = "Oct"; break;
+                case 11:
+                    name = "Nov"; break;
+                case 12:
+                    name = "Dec"; break;
+
+            }
+            value = (i < 10) ? "0" + i : i.ToString();
+            //selected = (month == value && monthEdit == value.AsInt()) ? "selected" : (monthEdit == value.AsInt()) ? "selected" : string.Empty;
+            if (month == value && monthEdit == value.AsInt())
+            {
+                selected = "selected";
+            }
+            else if (monthEdit == value.AsInt())
+            {
+                selected = "selected";
+            }
+            else
+            {
+                selected = string.Empty;
+            }
+            <option @selected value="@value">@value-@name</option>
+        }
+    </select>
+}
+
+
+@helper SelectStatus(string status = null)
+{
+    string publish = string.Empty;
+    string draft = string.Empty;
+    string pedding = string.Empty;
+
+    if (status != null)
+    {
+        if (status.Equals("publish"))
+        {
+            publish = "selected";
+        }
+        else if (status.Equals("draft"))
+        {
+            draft = "selected";
+        }
+        else if (status.Equals("pedding"))
+        {
+            pedding = "selected";
+        }
+    }
+    <select name="Status" class="form-control">
+        <option @publish value="publish">Publish</option>
+        <option @draft value="draft">Draft</option>
+        <option @pedding value="pedding">Pedding Review</option>
+    </select>
+}
+
+
+
+@*
+    Display dropdown for create or edit menu
+*@
+
+@helper DisplayMenuSelect(IEnumerable<Category> categories, Category term)
+{
+    <div class="row">
+        <div class="col-md-6">
+            <select class="form-control" name="CategoryParent">
+                <option value="0">None</option>
+                @if (categories != null)
+                {
+                    foreach (var cat in categories)
+                    {
+                        if (cat.CategoryParent == 0 && term.CategoryID != cat.CategoryID)
+                        {
+                            if (term.CategoryParent == cat.CategoryID)
+                            {
+                                <option value="@cat.CategoryID" selected="selected">@cat.CategoryName</option>
+                            }
+                            else
+                            {
+                                <option value="@cat.CategoryID">@cat.CategoryName</option>
+                            }
+                            @DisplaySubMenuSelect((int)cat.CategoryID, categories, term, 1)
+                        }
+                    }
+                }
+            </select>
+        </div>
+    </div>
+}
+
+@helper DisplaySubMenuSelect(int id, IEnumerable<Category> categories, Category term, int level = 1)
+{
+    string rowPerfix = string.Empty;
+
+    foreach (var cat in categories)
+    {
+        if (cat.CategoryParent != 0 && id == cat.CategoryParent && term.CategoryID != cat.CategoryParent)
+        {
+            for (int i = 0; i < level; i++)
+            {
+                rowPerfix += "— ";
+            }
+
+            if (term.CategoryParent == cat.CategoryID && cat.CategoryID != term.CategoryID)
+            {
+                <option value="@cat.CategoryID" selected="selected">@rowPerfix@cat.CategoryName</option>
+            }
+            else if (cat.CategoryID != term.CategoryID)
+            {
+                <option value="@cat.CategoryID">@rowPerfix@cat.CategoryName</option>
+            }
+
+            level++;
+            @DisplaySubMenuSelect((int)cat.CategoryID, categories, term, level)
+            level = level - 1;
+            rowPerfix = string.Empty;
+        }
+
+    }
+}
+
+
+@*
+    Hiển thị danh sách category thành table
+*@
+
+@helper DisplayMenuTable(IEnumerable<Category> categories, string action)
+{
+    string method = action + "/DeleteMany";
+    <form method="post" action="~/admin/@method">        
+        @AntiForgery.GetHtml()
+        <div class="tablenav">
+            <div class="pull-left">
+                <div class="dropdown">
+                    <button class="btn btn-default" type="button" id="dd-menu" data-toggle="dropdown">
+                        Action <span class="caret"></span>
+                    </button>
+
+                    <div class="dropdown-menu" role="menu">
+                        <div role="presentation">
+                            <button class="btn btn-link" type="submit" value="btnDelAll" id="deleteActionRun" role="menuitem" tabindex="-1">
+                                <span class="glyphicon glyphicon-remove"></span> Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pull-right">
+                <p class="description">Have all @CountItems(categories.Count())</p>
+            </div>
+        </div>
+
+        <table class="table table-hover widefat table-responsive">
+            <tr>
+                <th class="check-column">
+                    <input type="checkbox" name="actionDelete" value="all" id="select-all" />
+                </th>
+                <th>Name</th>
+                <th class="column-description">Description</th>
+                <th class="column-posts">Count</th>
+            </tr>
+            @if (categories != null)
+            {
+                foreach (var cat in categories)
+                {
+                    if (cat.CategoryParent == 0)
+                    {
+                        <tr>
+                            <td class="check-column"><input type="checkbox" name="actionDelete" value="@cat.Slug" /> </td>
+                            <td><a href="~/admin/@action/edit/@cat.Slug">@cat.CategoryName</a></td>
+                            <td>@cat.Description</td>
+                            <td>@cat.Count</td>
+                        </tr>
+                        @DisplaySubMenuTable((int)cat.CategoryID, categories, action, 1)
+                    }
+
+                }
+            }
+        </table>
+    </form>
+}
+
+@helper DisplaySubMenuTable(int id, IEnumerable<Category> categories, string action, int level = 1)
+{
+    string rowPerfix = string.Empty;
+
+    foreach (var cat in categories)
+    {
+        if (cat.CategoryParent != 0 && id == cat.CategoryParent)
+        {
+            for (int i = 0; i < level; i++)
+            {
+                rowPerfix += "— ";
+            }
+            <tr data-level="@level">
+                <td class="check-column"><input type="checkbox" name="actionDelete" value="@cat.Slug" /> </td>
+                <td><a href="~/admin/@action/edit/@cat.Slug">@rowPerfix@cat.CategoryName</a></td>
+                <td>@cat.Description</td>
+                <td>@cat.Count</td>
+            </tr>
+            level++;
+            @DisplaySubMenuTable((int)cat.CategoryID, categories, action, level)
+            level = level - 1;
+            rowPerfix = string.Empty;
+        }
+
+    }
+}
+
+
+/@**
+    Display category for post
+*@
+
+@helper DisplayMenuPost(IEnumerable<Category> categories, IEnumerable<Category> list = null)
+{
+
+    <ul>
+        @foreach (var cat in categories)
+        {
+            if (cat.CategoryParent == 0)
+            {
+                <li>
+                    @if (list != null)
+                    {
+                        string isChecked = string.Empty;
+                        var inList = list.Where(p => p.CategoryID == cat.CategoryID).FirstOrDefault();
+                        if (inList != null) { isChecked = "checked"; }
+                        <input type="checkbox" name="categories" value="@cat.CategoryID" @isChecked /> @cat.CategoryName
+                    }
+                    else
+                    {
+                        <input type="checkbox" name="categories" value="@cat.CategoryID" /> @cat.CategoryName
+                    }
+
+                </li>
+                @DisplaySubMenuPost((int)cat.CategoryID, categories, list, 1)
+
+            }
+
+        }
+    </ul>
+}
+
+@helper DisplaySubMenuPost(int id, IEnumerable<Category> categories, IEnumerable<Category> list, int level = 1)
+{
+    string rowPerfix = string.Empty;
+
+    foreach (var cat in categories)
+    {
+        if (id == cat.CategoryParent)
+        {
+            for (int i = 0; i < level; i++)
+            {
+                rowPerfix += "— ";
+            }
+            <li data-level="@level">
+                @if (list != null)
+                {
+                    string isChecked = string.Empty;
+                    var inList = list.Where(p => p.CategoryID == cat.CategoryID).SingleOrDefault();
+                    if (inList != null) { isChecked = "checked"; }
+                    <input type="checkbox" name="categories" value="@cat.CategoryID" @isChecked /> @rowPerfix@cat.CategoryName
+                }
+                else
+                {
+                    <input type="checkbox" name="categories" value="@cat.CategoryID" /> @rowPerfix@cat.CategoryName
+                }
+
+            </li>
+                level++;
+                //đệ qui
+                @DisplaySubMenuPost((int)cat.CategoryID, categories, list, level);
+                                                                             level = level - 1;
+                                                                             rowPerfix = string.Empty;
+        }
+
+    }
+}
+
+@**
+    Load cac danh muc cho mot bai viet
+*@
+
+@helper LoadTerms(dynamic list, string slug, string taxonomy = "category")
+{
+    int i = 0;
+
+    foreach (Category cat in list)
+    {
+        if (cat.CategoryType == taxonomy)
+        {
+            if (i == 0)
+            {
+                <a href="Index?category=@cat.Slug">@cat.CategoryName</a>
+            }
+            else
+            {
+                <text>, </text><a href="Index?category=@cat.Slug">@cat.CategoryName</a>
+            }
+            i++;
+        }
+    }
+}
+
+@*
+    * Format ngay viet
+*@
+@helper FormatDatePost(dynamic post)
+{
+    if (post.Modified != null)
+    { 
+        var datet = Convert.ToDateTime(post.Modified).ToString("dd/MM/yyyy");
+        <p class="text-right">
+            <abbr title="Created">@datet</abbr><br />@post.Status
+        </p>
+    }
+}
+
+@helper LoadTagForEdit(dynamic list, string slug, string taxonomy = "tag")
+{
+    if (!string.IsNullOrEmpty(slug))
+    {
+        int i = 0;
+        if (list != null)
+        {
+
+            foreach (Category cat in list)
+            {
+                if (cat.CategoryType == taxonomy)
+                {
+                    if (i == 0)
+                    { @cat.CategoryName }
+                    else
+                    { <text>, @cat.CategoryName</text> }
+                    i++;
+                }
+            }
+
+        }
+    }
+}
+@helper DisplaySearch(string typeName, string typeSearch)
+{
+    <div class="col-lg-12">
+        <div class="tablenav">
+            <div class="pull-left">
+                <h3>@typeName <a href="~/admin/@typeSearch/create" class="btn btn-success btn-xs">Add New</a></h3>
+            </div>
+            <div class="pull-right">
+                <div class="top">
+                    <div class="form-inline">
+                        @FromSearch(typeSearch)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@helper FromSearch(dynamic text)
+{
+    <form method="get">
+        <div class="form-group input-group">
+            <input class="form-control input-sm" type="text" placeholder="Enter @text title" name="search" value="@Request["search"]">
+            <span class="input-group-btn">
+                <button class="btn btn-default btn-sm" type="submit"><i class="glyphicon glyphicon-search"></i> Search @text</button>
+            </span>
+        </div>
+    </form>
+}
+
+@helper CountItems(dynamic total)
+{
+    var items = total > 1 ? "items" : "item";
+    @total<text> @items</text>
+}
+
+
+
+@helper DisplayPageParent(IEnumerable<Posts> pages, Posts page = null)
+{
+    <div class="row">
+        <div class="col-md-9">
+            <select name="Parent" class="form-control">
+                <option value="0">No parent</option>
+                @foreach (var item in pages)
+                {
+                    if (item.Parent == 0)
+                    {
+                        if (page.Parent == item.PostID && item.PostID != page.PostID)
+                        {
+                            <option value="@item.PostID" selected="selected">@item.Title</option>
+                        }
+                        else if (item.PostID != page.PostID)
+                        {
+                            <option value="@item.PostID">@item.Title</option>
+                        }
+                        @DisplayPageChild((int)item.PostID, pages, page, 1)
+                    }
+                }
+            </select>
+        </div>
+    </div>    
+}
+
+@helper DisplayPageChild(int id, IEnumerable<Posts> pages, Posts pageEdit, int level = 1)
+{
+    string rowPerfix = string.Empty;
+
+    foreach (var cat in pages)
+    {
+        if (cat.Parent != 0 && id == cat.Parent && pageEdit.PostID != cat.Parent)
+        {
+            for (int i = 0; i < level; i++)
+            {
+                rowPerfix += "— ";
+            }
+
+            if (pageEdit.Parent == cat.PostID && cat.PostID != pageEdit.PostID)
+            {
+                <option value="@cat.PostID" selected="selected">@rowPerfix@cat.Title</option>
+            }
+            else if (cat.PostID != pageEdit.PostID)
+            {
+                <option value="@cat.PostID">@rowPerfix@cat.Title</option>
+            }
+
+            level++;
+            @DisplayPageChild((int)cat.PostID, pages, pageEdit, level)
+            level = level - 1;
+            rowPerfix = string.Empty;
+        }
+    }
+}

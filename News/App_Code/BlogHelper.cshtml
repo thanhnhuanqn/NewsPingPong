@@ -1,0 +1,168 @@
+﻿@using Microsoft.Web.Helpers;
+@using News.Areas.Admin.Models;
+@using News.Data;
+@using News.Models;
+
+
+@*
+    lấy các tag của một bài viết
+*@
+@helper tag_post(string post_name, string tag_type)
+{
+    var list = PostModel.GetTags(post_name, tag_type);
+    int i = 0;
+
+    foreach (var tag in list)
+    {
+        if (i == 0)
+        {<a href="~/?tag=@tag.Slug">@tag.CategoryName</a>}
+        else
+        {<text>, </text><a href="~/?tag=@tag.Slug">@tag.CategoryName</a>}
+        i++;
+    }
+}
+
+
+@*
+    lấy tất cả các tag hiện có
+*@
+@helper tags(dynamic list)
+{
+    int i = 0;
+
+    foreach (Category cat in list)
+    {
+        if (i == 0)
+        {<a href="~/?tag=@cat.Slug">@cat.CategoryName</a>}
+        else
+        {<text>, </text><a href="~/?tag=@cat.Slug">@cat.CategoryName</a>}
+        i++;
+    }
+}
+
+
+@*
+    lấy các danh mục của một bài viết
+*@
+
+@helper categories_post(string post_name)
+{
+    var list = PostModel.GetCategories(post_name);
+    int i = 0;
+
+    foreach (var cat in list)
+    {
+        if (i == 0)
+        {
+            <a href="~/?cat=@cat.Slug">@cat.CategoryName</a>
+        }
+        else
+        {
+            <text>, </text><a href="~/?cat=@cat.Slug">@cat.CategoryName</a>
+        }
+        i++;
+    }
+}
+
+@*
+    Lấy tất cả các danh mục hiện có.
+*@
+
+@helper categories(IEnumerable<Category> categories)
+{
+    if (categories.Count() > 0)
+    {
+        <ul>
+            @foreach (Category cat in categories)
+            {
+                if (cat.CategoryParent == 0)
+                {
+                    <li>
+                        <a href="~/?cat=@cat.Slug">@cat.CategoryName</a>
+                        @sub_categories((int)cat.CategoryID, categories, 1)
+                    </li>
+                }
+
+            }
+        </ul>
+    }
+}
+
+@*
+    Đệ quy để hiển thị các danh mục nhiều cấp.
+*@
+
+@helper sub_categories(int id, IEnumerable<Category> categories, int level = 1)
+{
+    string rowPerfix = string.Empty;
+
+    foreach (var cat in categories)
+    {
+        if (cat.CategoryParent != 0 && id == cat.CategoryParent)
+        {
+            for (int i = 0; i < level; i++)
+            {
+                rowPerfix += "— ";
+            }
+            <li data-level="@level"><a href="~/?cat=@cat.Slug">@rowPerfix@cat.CategoryName</a></li>
+            level++;
+            //đệ qui
+            @sub_categories((int)cat.CategoryID, categories, level);
+            level = level - 1;
+            rowPerfix = string.Empty;
+
+    }
+
+}
+}
+
+@helper LoadCSS(IEnumerable<string> obj, string path = "/css/")
+{
+    foreach (var style in obj)
+    {
+        var css = style + ".css";
+        <link rel="stylesheet" href="@Href(Themes.ThemeDirectory + "/" + Themes.CurrentTheme + path + css)" type="text/css" media="all">
+    }
+}
+
+@helper LoadJS(IEnumerable<string> obj, string path = "/js/")
+{
+    foreach (var js in obj)
+    {
+        var file = js + ".js";
+        <script src="@Href(Themes.ThemeDirectory + "/" + Themes.CurrentTheme + path + file)" type="text/javascript"></script>
+    }
+}
+
+
+@helper GetCategoryName(string cat_name)
+{
+
+    var category = BlogService.GetCategoryName(cat_name);
+
+    if (category != null)
+    {
+        @category.CategoryName
+    }
+}
+
+@helper PageLinks(PagingInfo pagingInfo, Func<int, string> pageUrl)
+{
+    <ul class="pagination">
+        <li><a href="@pageUrl(1)">&laquo;</a></li>
+        @for (int i = 1; i <= pagingInfo.TotalPages; i++)
+        {
+            if (i == pagingInfo.CurrentPage)
+            {
+                <li class="active"><a href="@pageUrl(i)">@i</a></li>
+            }
+            else
+            {
+                <li><a href="@pageUrl(i)">@i</a></li>
+            }
+        }
+        <li><a href="@pageUrl(pagingInfo.TotalPages)">&raquo;</a></li>
+    </ul>
+
+}
+

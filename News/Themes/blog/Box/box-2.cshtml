@@ -1,0 +1,94 @@
+﻿@using News.Models;
+@using News.Data;
+
+@{
+    var category_name_1 = "dien-thoai";
+    var category_name_2 = "pc";
+}
+@helper GetNewsCategory(string category, int top)
+{
+    var posts = BlogService.GetPostsByCategory(slug: category, take: top);
+    if (posts != null)
+    {
+        int i = 1;
+        foreach (var item in posts)
+        {
+            <div class="topic col-sm-16">
+                <a href="~/blog/@Html.Raw(item.Name)">
+                    <img class="img-thumbnail" src="~/thumbnail/@item.PostID?size=600x227" alt="@item.Name" />
+                    <h3>@Html.Raw(item.Title)</h3>
+                    <div class="text-danger sub-info-bordered ">
+                        <div class="time"><span class="ion-android-data icon"></span>@Html.Raw(Convert.ToDateTime(item.Created).ToString("dd MMM yyyy"))</div>
+                        <div class="comments">
+                            <span class="ion-chatbubbles icon"></span>
+                            <span class="fb-comments-count" data-href="http://@Request.Url.Authority/blog/@item.Name"></span>
+                        </div>
+                    </div>
+                </a>
+                <p>
+                    @Html.Raw(item.Excerpt)
+                </p>
+            </div>
+            break;
+        }
+        <div class="col-sm-16">
+            <ul class="list-unstyled  ex-top-padding">
+                @foreach (var item in posts)
+                {
+                    if (i == 1)
+                    {
+                        i++;
+                        continue;
+                    }
+
+                    if (i > 3)
+                    {
+                        break;
+                    }
+                    <li>
+                        <a href="~/blog/@Html.Raw(item.Name)">
+                            <div class="row">
+                                <div class="col-lg-3 col-md-4 hidden-sm">
+                                    <img alt="@item.Title" src="~/thumbnail/@item.PostID?size=76x76" class="img-thumbnail pull-left">
+                                </div>
+                                <div class="col-lg-13 col-md-12">
+                                    <h4>@Html.Raw(item.Title)</h4>
+                                    <div class="text-danger sub-info">
+                                        <div class="time"><span class="ion-android-data icon"></span>@Html.Raw(Convert.ToDateTime(item.Created).ToString("dd MMM yyyy"))</div>
+                                        <div class="comments">
+                                            <span class="ion-chatbubbles icon"></span>
+                                            <span class="fb-comments-count" data-href="@Request.Url.AbsoluteUri/blog/@item.Name"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                    i++;
+                }
+            </ul>
+        </div>
+    }
+}
+<!-- Tin-tuc & Chuyen-de start -->
+<div class="col-sm-16">
+    <div class="row">
+        <div class="col-xs-16 col-sm-8  wow fadeInLeft animated science" data-wow-delay="0.5s" data-wow-offset="130">
+            <div class="main-title-outer pull-left">
+                <div class="main-title">@Html.Raw(BlogHelper.GetCategoryName(category_name_1))</div>
+            </div>
+            <div class="row">
+                @GetNewsCategory(category: category_name_1, top: 3)
+            </div>
+        </div>
+        <div class="col-sm-8 col-xs-16 wow fadeInRight animated" data-wow-delay="0.5s" data-wow-offset="130">
+            <div class="main-title-outer pull-left">
+                <div class="main-title">@Html.Raw(BlogHelper.GetCategoryName(category_name_2))</div>
+            </div>
+            <div class="row">
+                @GetNewsCategory(category: category_name_2, top: 3)
+            </div>
+        </div>
+    </div>    
+</div>
+<!-- Tin-tuc & Chuyen-de end -->

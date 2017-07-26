@@ -1,0 +1,50 @@
+﻿@using eCommerce.News.Models;
+@using eCommerce.News.Data;
+@{
+    var news = QueryModel.GetPostsHot("dien-thoai", 2);
+    if (news != null)
+    {
+        if (news.Count() >= 1)
+        {
+            <div class="col-sm-16 right-img-top ">
+                <a href="~/blog/@news[0].Name">
+                    <div class="box">
+                        <div class="carousel-caption">@news[0].Title</div>
+                        <img class="img-responsive" src="~/thumbnail/@news[0].PostID?size=440x292" alt="@news[0].Title" />
+                        <div class="overlay"></div>
+                        <div class="overlay-info">
+                            <div class="cat">
+                                <p class="cat-data"><span class="ion-android-data"></span>Hot</p>
+                            </div>
+                            <div class="info">
+                                <p><span class="ion-android-data"></span>@Html.Raw(Convert.ToDateTime(news[0].Created).ToString("dd MMM yyyy"))<span class="ion-chatbubbles"></span>@news[0].CommentCount</p>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            if (news.Count() >= 2)
+            {
+                <div class="col-sm-16 right-img-btm ">
+                    <a href="~/blog/@news[1].Name">
+                        <div class="box">
+                            <div class="carousel-caption">
+                                @news[1].Title
+                            </div>
+                            <img class="img-responsive" src="~/thumbnail/@news[1].PostID?size=440x292" alt="@news[1].Title" />
+                            <div class="overlay"></div>
+                            <div class="overlay-info">
+                                <div class="cat">
+                                    <p class="cat-data"><span class="ion-android-data"></span>Hot</p>
+                                </div>
+                                <div class="info">
+                                    <p><span class="ion-android-data"></span>@Html.Raw(Convert.ToDateTime(news[1].Created).ToString("dd MMM yyyy"))<span class="ion-chatbubbles"></span>@news[1].CommentCount</p>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+        }
+    }
+}

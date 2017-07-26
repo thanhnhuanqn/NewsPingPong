@@ -1,0 +1,159 @@
+﻿@model News.Data.Users
+@using Santhos.Web.Mvc.BootstrapFlashMessages
+@using News.Data
+@using News.Areas.Admin.Models;
+@using News.Data;
+
+
+@{
+    ViewBag.Title = "Profile";
+    //Roles
+    var roles = RoleModel.GetAllRoles();
+                
+    var role = Roles.GetRolesForUser(UrlData[0]).ToList().FirstOrDefault();
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <h3 id="add-new-user"> Profiles user</h3>
+        <p class="description">Personal Options</p>
+        <br />
+        <form method="post" class="form-horizontal">
+            
+            @Html.FlashMessages(true)
+
+            @AntiForgery.GetHtml()
+            <input type="hidden" value="new" name="form-register" />
+            @Html.ValidationSummary(true)
+           
+            <h4>Name</h4>
+            <div class="form-group">
+                <label for="username" class="col-md-3">Username</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="text" id="username" name="username" value="@Model.UserName" disabled />
+                    <p class="description">Usernames cannot be changed.</p>
+                </div>
+
+            </div>
+            <br />
+            <div class="form-group">
+                <label for="firstname" class="col-md-3">First Name</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="text" id="firstname" name="firstname" value="@Model.UserMeta.Where(t => t.MetaKey.Equals("first_name")).FirstOrDefault().MetaValue" />
+                    @Html.ValidationMessage("firstname")
+                </div>
+            </div>
+            <br />
+            <div class="form-group">
+                <label for="lastname" class="col-md-3">Last Name</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="text" id="lastname" name="lastname" value="@Model.UserMeta.Where(t => t.MetaKey == "last_name").FirstOrDefault().MetaValue" />
+                    @Html.ValidationMessage("lastname")
+                </div>
+            </div>
+            <br />
+            <div class="form-group">
+                <label for="lastname" class="col-md-3">Nick Name</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="text" id="nickname" name="nickname" value="@Model.UserMeta.Where(t => t.MetaKey == "nickname").FirstOrDefault().MetaValue" />
+                    @Html.ValidationMessage("nickname")
+                </div>
+            </div>
+            <br />
+
+            <h4>Contact Info</h4>
+            <div class="form-group">
+                <label for="email" class="col-md-3">E-mail (required)</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="text" id="email" name="email" value="@Model.Email" />
+                    @Html.ValidationMessage("email")
+                </div>
+            </div>
+            <br />
+            <div class="form-group">
+                <label for="lastname" class="col-md-3">Website</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="text" id="website" name="website" value="@Model.Url" />
+                    @Html.ValidationMessage("website")
+                </div>
+            </div>
+            <br />
+            <h4>About Yourself</h4>
+            <div class="form-group">
+                <label for="lastname" class="col-md-3">Biographical Info</label>
+                <div class="col-md-4">
+                    <textarea class="form-control" id="description" name="description">@Model.UserMeta.Where(t => t.MetaKey == "description").FirstOrDefault().MetaValue</textarea>
+                    @Html.ValidationMessage("description")
+                    <p class="description">Share a little biographical information to fill out your profile. This may be shown publicly.</p>
+                </div>
+
+            </div>
+            <br />
+
+            <div class="form-group">
+                <label for="password-old" class="col-md-3">Password old</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="password" id="password-old" name="password-old" value="" />
+                    @Html.ValidationMessage("password_old")
+                    <p class="description">If you would like to change the password type a new one. Otherwise leave this blank.</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="password" class="col-md-3">New Password</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="password" id="password" name="password" value="" />
+                    @Html.ValidationMessage("password")
+                </div>
+            </div>
+            <br />
+            <div class="form-group">
+                <label for="password2" class="col-md-3">Repeat New Password</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="password" id="password2" name="password2" value="" />
+                </div>
+            </div>
+            <br />
+            <div class="form-group">
+                <label for="role" class="col-md-3">Role</label>
+                <div class="col-md-2">
+                    <select name="role" class="form-control">
+                        @*@if (Roles.IsUserInRole("Administrator"))
+                        {*@
+                            @foreach (var itemRole in roles)
+                            {
+
+                                if (role != null)
+                                {
+                                    if (role.Equals(itemRole))
+                                    {
+                                        <option selected>@itemRole</option>
+                                    }
+                                    else
+                                    {
+                                        <option>@itemRole</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option>@itemRole</option>
+                                }
+                            }
+
+                        @*}
+                        else
+                        {
+                            <option>@Roles.GetRolesForUser().ToList().FirstOrDefault()</option>
+                        }*@
+                    </select>
+                </div>
+            </div>
+            <br />
+
+            <div class="form-group">
+                <div class="col-md-3">
+                    <input class="btn btn-primary" type="submit" name="Submit" value="Update Profile" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

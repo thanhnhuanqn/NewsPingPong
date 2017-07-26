@@ -1,0 +1,99 @@
+﻿@using News.Areas.Admin.Models
+@using News.Data
+@{
+    Category getNavMenuName = ViewBag.Menu;
+
+    if (getNavMenuName != null)
+    {
+        var posts = MenuModel.GetMenuItemByMenuId(getNavMenuName.CategoryID);
+        <form method="post" action="~/admin/menu/UpdateItems">
+            @AntiForgery.GetHtml()
+            <h4>Edit menu →@getNavMenuName.CategoryName <span class="label label-info">posts.Count</span></h4>
+            <table class="table table-bordered widefat">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Parent</th>
+                        <th>Original</th>
+                        <th>Order</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @if (posts != null)
+                    {
+                        foreach (Posts item in posts)
+                        {
+                            dynamic child = MenuModel.GetMenuItemChildByMenuId((int)item.PostID);
+
+                            if (item.Parent == 0)
+                            {
+                                <tr>
+                                    <td>
+                                        <input type="hidden" value="@item.PostID" name="menu-item-id" />
+                                        <input class="input-sm" type="text" value="@item.Title" name="menu-item-name" required />
+                                        <span><small><em>@PostMetaModel.GetMetaKey(Convert.ToInt32(item.PostID), "_item_menu_type")</em></small></span>
+                                    </td>
+                                    <td>@MenuHelpers.DisplayNavItem(getNavMenuName.Slug, (int)item.PostID, (int)item.Parent)</td>
+                                    <td>@MenuHelpers.CustomItemOriginal((int)item.PostID)</td>
+                                    <td><input class="input-sm" type="number" value="@item.Order" name="menu-item-order" /></td>
+                                    <td><a class="btn btn-xs btn-warning" href="~/admin/menu/removeitem/@item.PostID">Remove</a></td>
+                                </tr>
+                            }
+                            if (child != null)
+                            {
+                                @nav_sub(posts, item.PostID, getNavMenuName, 1)
+                            }
+                        }
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="5">
+                            <input type="submit" value="Update Items" name="update-all-item" class="btn btn-success" />
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </form>
+    }
+}
+
+@helper nav_sub(dynamic list_nav_item, decimal id, dynamic getNavMenuName, int level = 1)
+{    
+    
+    string rowPerfix = string.Empty;
+    dynamic child = MenuModel.GetMenuItemChildByMenuId(id);
+
+    if (child != null)
+    {
+
+        foreach (Posts item in list_nav_item)
+        {
+            if (item.Parent != 0 && id == item.Parent)
+            {
+                for (int i = 0; i < level; i++)
+                {
+                    rowPerfix += "— ";
+                }
+                <tr data-level ="@level">
+                    <td class="text text-success bg-info">
+                        <input type="hidden" value="@item.PostID" name="menu-item-id" />
+                        @rowPerfix<input class="input-sm" type="text" value="@item.Title" name="menu-item-name" required />
+                        <span><small><em>@PostMetaModel.GetMetaKey(Convert.ToInt32(item.PostID), "_menu_item_object")</em></small></span>
+                    </td>
+                    <td>@MenuHelpers.DisplayNavItem(getNavMenuName.Slug, item.PostID, item.Parent)</td>
+                    <td>@MenuHelpers.CustomItemOriginal((int)item.PostID)</td>
+                    <td><input class="input-sm" type="number" value="@item.Order" name="menu-item-order" /></td>
+                    <td><a class="btn btn-xs btn-warning" href="~/admin/menu/removeitem/@item.PostID">Remove</a></td>
+                </tr>
+                    level++;
+                    //đệ qui
+                    @nav_sub(list_nav_item, item.PostID, getNavMenuName, level); level = level - 1; rowPerfix = string.Empty;
+
+
+            }
+        }            
+}
+}

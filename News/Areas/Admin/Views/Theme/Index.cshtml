@@ -1,0 +1,74 @@
+﻿@using Microsoft.Web.Helpers;
+@using News.Areas.Admin.Controllers.Components;
+@using News.Areas.Admin.Models
+@{
+    ViewBag.Title = "Manage Themes";
+
+    if (Request.QueryString["active"] != null)
+    {
+        string theme = Request.QueryString["active"];
+        if (Themes.AvailableThemes.Contains(theme))
+        {
+            OptionModel.CreateKeyValue("current_theme", theme);
+        }
+        Response.Redirect(Request.UrlReferrer.OriginalString);
+    }
+
+}
+
+<div class="row" id="gpwrap">
+    <div class="col-lg-12">
+        <h3>Themes <span class="badge badge-info">@Themes.AvailableThemes.Count</span></h3>
+    </div>
+    <div class="col-lg-12">
+        @{
+            if (Themes.AvailableThemes.Count > 0)
+            {
+                @:<div class="row">
+            }
+            else
+            {
+                @:<div>
+            }
+
+            string theme_current = OptionModel.GetOption("current_theme");
+            string active = string.Empty;
+
+            foreach (var item in Themes.AvailableThemes)
+            {
+                if (item == theme_current) { active = "active"; }
+                else
+                {
+                    active = string.Empty;
+                }
+                <div class="col-sm-4">
+                    <div class="theme @active">
+                        @{
+                var files = Util.GetAllPagesInFolder(Themes.ThemeDirectory + "/" + item, "screenshot.png");
+
+                foreach (var file in files)
+                {
+                    <div class="theme-screenshot">
+                        <img src="@Href(file)" />
+                    </div>
+                    if (!string.IsNullOrEmpty(active))
+                    {
+                        <h3 class="theme-name" id="@item"><span>Active:</span> @item</h3>
+                    }
+                    else
+                    {
+                        <h3 class="theme-name" id="@item">@item</h3>
+                            <div class="theme-actions">
+                                <a class="btn btn-primary" href="@Href("~/admin/theme/Index?active="+item)">Active</a>
+                            </div>
+                    }
+                }
+                        }
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+</div>
+<div class="clearfix"></div>

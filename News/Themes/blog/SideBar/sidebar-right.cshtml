@@ -1,0 +1,36 @@
+﻿
+<!-- right sec Start -->
+<div class="col-sm-5 hidden-xs right-sec">
+    <div class="">
+        <div class="row ">
+            <!-- activities end -->
+            <div class="col-sm-16 bt-space wow fadeInUp animated" data-wow-delay="1s" data-wow-offset="50">
+                <img class="img-responsive" src="~/Themes/blog/images/ads/336-280-ad.gif" width="336" height="280" alt="" /> <a href="#" class="sponsored">sponsored advert</a>                
+            </div>
+            <!-- activities start -->
+
+            <div class="col-sm-16 bt-space wow fadeInUp animated" data-wow-delay="1s" data-wow-offset="130">
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs nav-justified " role="tablist">
+                    <li class="active"><a href="#popular" role="tab" data-toggle="tab">Cũ hơn</a></li>
+                    <li><a href="#recent" role="tab" data-toggle="tab">Xem nhiều</a></li>
+                </ul>
+
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div class="tab-pane active" id="popular">
+                        <ul class="list-unstyled">
+                            @RenderPage(Functions.GetFilePath("Templates/TabPopular"), 10)
+                        </ul>
+                    </div>
+                    <div class="tab-pane" id="recent">
+                        <ul class="list-unstyled">
+                            @RenderPage(Functions.GetFilePath("Templates/TabRecent"), 10)
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Right Sec End -->

@@ -1,0 +1,86 @@
+﻿@model IEnumerable<News.Data.Category>
+@using Santhos.Web.Mvc.BootstrapFlashMessages
+
+@{
+    ViewBag.Title = "Manager Tags";
+}
+
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <h3>Tags <a href="~/admin/tag/index" class="btn btn-success btn-xs">Add new</a> </h3>
+    </div>
+    <div class="col-lg-12">
+        @Html.FlashMessages(true)
+    </div>
+    <div class="col-md-4">
+
+        <form name="post" method="post" action="~/admin/tag/index">
+            @AntiForgery.GetHtml()
+            @Html.ValidationSummary(true)
+            <input type="hidden" name="taxonomy" value="tag" />
+
+            <div class="form-group ">
+                <label>Tag name:</label>
+
+                <input class="form-control" type="text" name="CategoryName" value="@Request["CategoryName"]" />
+                @Html.ValidationMessage("CategoryName")
+                <p class="description">The name is how it appears on your site.</p>
+
+            </div>
+
+            <div class="form-group ">
+                <label>Slug</label>
+
+                <input class="form-control" type="text" name="Slug" value="@Request["Slug"]" />
+                @Html.ValidationMessage("Slug")
+                <p class="description">The “slug” is the URL-friendly version of the name. It is usually all lowercase and contains only letters, numbers, and hyphens.</p>
+
+            </div>
+
+            <div class="form-group ">
+                <label>Description</label>
+                <textarea class="form-control" name="Description">@Request["Description"]</textarea>
+                @Html.ValidationMessage("Description")
+                <p class="description">The description is not prominent by default; however, some themes may show it.</p>
+            </div>
+
+            <div class="form-group ">
+                <input class="btn btn-primary" type="submit" name="Submit" value="Create tag" />
+            </div>
+        </form>
+    </div>
+    <div class="col-md-8">
+        @PostHelpers.DisplayMenuTable(ViewBag.Categories, "tag")
+        <p class="description">
+            <strong>Note:</strong><br>Deleting a category does not delete the posts in that category. Instead, posts that were only assigned to the deleted category are set to the category <strong>Uncategorized</strong>.
+        </p>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        $(function () {
+
+            $("#deleteActionRun").click(function () {
+                return confirm("Are you sure you want to delete?");
+            });
+
+            $('#select-all').click(function (event) {
+                if (this.checked) {
+                    // Iterate each checkbox
+                    $(':checkbox').each(function () {
+                        this.checked = true;
+                    });
+                }
+                if (!this.checked) {
+                    // Iterate each checkbox
+                    $(':checkbox').each(function () {
+                        this.checked = false;
+                    });
+                }
+            });            
+        });
+    </script>
+}

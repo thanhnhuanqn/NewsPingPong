@@ -1,0 +1,9 @@
+﻿@helper Alert(string clsCss = "alert alert-success")
+{
+    if (!string.IsNullOrEmpty(PageData["Message"]))
+    {
+        <div class="@clsCss" data-dismiss="alert">
+            @PageData["Message"]
+        </div>
+    }
+}

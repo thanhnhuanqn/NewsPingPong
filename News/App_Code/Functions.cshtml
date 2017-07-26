@@ -1,0 +1,211 @@
+﻿@using System.Text.RegularExpressions;
+@using System.IO;
+@using System.Drawing;
+@using System.Drawing.Imaging;
+@using System.Drawing.Drawing2D;
+@using Microsoft.Web.Helpers;
+
+@functions {
+
+   
+    /// <summary>
+    /// Lấy đường đẫn của một file của theme hiện hành.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    public static string GetFilePath(string name = null)
+    {
+        var path = string.Empty;
+
+        if (String.IsNullOrEmpty(name))
+        {
+            path = Themes.ThemeDirectory + "/" + Themes.CurrentTheme + "/content.cshtml";
+        }
+        else
+        {
+            path = Themes.ThemeDirectory + "/" + Themes.CurrentTheme + "/" + name + ".cshtml";
+        }
+
+        return path;
+    }
+    
+    /// <summary>
+    /// Xoá một file bất kỳ bằng cách chỉ định tên file và đường dẫn tương đối đối của file
+    /// </summary>
+    /// <param name="file">file cần xoá</param>
+    /// <param name="folder">đường dẫn tương đối đến file</param>
+    public static void DeleteFile(string file, string folder)
+    {
+        var location = Server.MapPath(folder);
+        var fileName = file;
+        var path = Path.Combine(location, fileName);
+        FileInfo fileOrg = new FileInfo(path);
+        if (fileOrg.Exists)
+        {
+            fileOrg.Delete();
+        }
+    }
+
+    /// <summary>
+    /// Chuyển đối số byte thành đơn vị tính tương ứng cho dễ đọc
+    /// </summary>
+    /// <param name="bytes">Số bytes cần chuyển</param>
+    /// <param name="decimals">Lấy bao nhiêu phần lẻ</param>
+    /// <returns>Trả về chuổi đơn vị tương ứng</returns>
+    public static string SizeFormat(long bytes, int decimals = 0)
+    {
+        var quant = new Dictionary<string, long>();
+        quant.Add("TB", 1099511627776);  // pow( 1024, 4)
+        quant.Add("GB", 1073741824);// pow( 1024, 3)
+        quant.Add("MB", 1048576);// pow( 1024, 2)
+        quant.Add("kB", 1024);// pow( 1024, 1)
+        quant.Add("B", 1);// pow( 1024, 0)
+
+        foreach (var item in quant)
+        {
+            if (bytes >= item.Value)
+            {
+                return String.Format("{0:f}", bytes / (item.Value * 1.0)) + " " + item.Key;
+            }
+        }
+        return string.Empty;
+    }
+
+    /// <summary>
+    /// Cắt - xén hình thành đã có thành một hình mới với toạ độ và kích thước được chỉ định
+    /// Không resize hình ảnh.
+    /// </summary>
+    /// <param name="Img">Hình ảnh gốc</param>
+    /// <param name="Width">Chiều rộng ảnh mới</param>
+    /// <param name="Height">Chiều cao ảnh mới</param>
+    /// <param name="X">Điểm x - Toạ độ ngang bắt đầu cắt trên ảnh gốc</param>
+    /// <param name="Y">Điểm y - Toạ độ dọc được chọn để cắt trên ảnh gốc</param>
+    /// <returns>trả về hình ảnh được cắt dưới dạng một mảng các bytes.</returns>
+    public static dynamic Crop(string Img, int Width, int Height, int X, int Y)
+    {
+        try
+        {
+            using (Image OriginalImage = Image.FromFile(Img))
+            {
+                using (Bitmap bmp = new Bitmap(Width, Height))
+                {
+                    bmp.SetResolution(OriginalImage.HorizontalResolution, OriginalImage.VerticalResolution);
+
+                    using (Graphics Graphic = Graphics.FromImage(bmp))
+                    {
+                        Graphic.SmoothingMode = SmoothingMode.AntiAlias;
+                        Graphic.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                        Graphic.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                        Graphic.DrawImage(OriginalImage, new Rectangle(0, 0, Width, Height), X, Y, Width, Height, GraphicsUnit.Pixel);
+                        MemoryStream ms = new MemoryStream();
+                        bmp.Save(ms, OriginalImage.RawFormat);
+                        return ms.GetBuffer();
+                    }
+                }
+            }
+        }
+        catch (Exception Ex)
+        {
+            throw (Ex);
+        }
+    }
+
+    /// <summary>
+    /// Đọc tất cả các file trong một thư mục được chỉ định.
+    /// </summary>
+    /// <param name="virtualPath">đường dẫn tới thư mục</param>
+    /// <param name="searchPattern">tên file tìm kiếm</param>
+    /// <returns>tất cả các file trong thư mục đó.</returns>
+
+    public static string[] GetAllPagesInFolder(string virtualPath, string searchPattern)
+    {
+        string physicalPath = Server.MapPath(virtualPath);
+
+        // childrenFiles are physical paths. We need to convert them into virtual paths
+        string[] childrenFiles = Directory.EnumerateFiles(physicalPath, searchPattern, SearchOption.TopDirectoryOnly).ToArray();
+        string[] childrenVirtualPaths = new string[childrenFiles.Length];
+
+        for (int i = 0; i < childrenFiles.Length; ++i)
+        {
+            // convert physical path to virtual path
+            childrenVirtualPaths[i] = childrenFiles[i].Replace(Request.PhysicalApplicationPath, "~/").Replace(Path.DirectorySeparatorChar, '/');
+        }
+
+        return childrenVirtualPaths;
+    }
+
+
+    public static bool IsEqualTo<T>(T value, T comparator) where T : IComparable
+    {
+        return value.Equals(comparator);
+    }
+    
+    public static bool IsGreaterThan<T>(T value, T comparator) where T : IComparable
+    {
+        return value.CompareTo(comparator) > 0;
+    }
+    
+    public static bool IsLessThan<T>(T value, T comparator) where T : IComparable
+    {
+        return value.CompareTo(comparator) < 0;
+    }
+    
+    public static bool IsGreaterThanOrEqualTo<T>(T value, T comparator) where T : IComparable
+    {
+        return value.CompareTo(comparator) >= 0;
+    }
+    
+    public static bool IsLessThanOrEqualTo<T>(T value, T comparator) where T : IComparable
+    {
+        return value.CompareTo(comparator) <= 0;
+    }
+
+    public static bool IsBetween<T>(T value, T minValue, T maxValue) where T : IComparable
+    {
+        return (value.CompareTo(minValue) >= 0 && value.CompareTo(maxValue) <= 0);
+    }
+
+    public static bool IsNumbersOnly(string value)
+    {
+        if (!string.IsNullOrEmpty(value))
+        { 
+            string expression = @"^[0-9]+$";
+            return System.Text.RegularExpressions.Regex.IsMatch(value, expression);
+        }
+        return false;
+    }
+    
+    public static bool IsLettersOnly(string value)
+    {
+        string expression = @"^[A-Za-z]+$";
+        return System.Text.RegularExpressions.Regex.IsMatch(value, expression);
+    }
+
+    public static bool IsAlphaNumeric(string value)
+    {
+        string expression = @"^[A-Za-z0-9]+$";
+        return System.Text.RegularExpressions.Regex.IsMatch(value, expression);
+    }
+    
+    public static bool IsValidEmail(string value)
+    {
+        string expression = @"^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}" +
+        @"\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\" +
+        @".)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$";
+        return System.Text.RegularExpressions.Regex.IsMatch(value, expression);
+    }
+
+    public static bool IsValidEmail_(string s)
+    {
+        string pattern = @"^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$";
+        return Regex.IsMatch(s, pattern);
+    }
+
+    public static string CleanNames(string name)
+    {        
+        name = name.Replace(".cshtml", "");
+        return name;
+    }
+
+
+}

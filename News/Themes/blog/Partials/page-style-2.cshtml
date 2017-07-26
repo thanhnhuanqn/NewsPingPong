@@ -1,0 +1,120 @@
+﻿@using News.Models;
+@using News.Data;
+@using News.Areas.Admin.Models;
+@{
+    dynamic cat_name = BlogService.GetCategoryName(Model);
+
+    IEnumerable<dynamic> posts = null;
+
+    if (cat_name != null)
+    {
+        posts = BlogService.GetPostsByCategory(cat_name.Slug,1000, null);
+    }
+    string term_name = string.Empty;
+    if (cat_name != null)
+    {
+        term_name = cat_name.CategoryName;
+        OptionModel.TitleCurrent = cat_name.CategoryName;
+    }
+    int ItemsPerPage = Convert.ToInt32(OptionModel.GetOption("blog_per_page"));
+
+    //var grid = new WebGrid(source: posts, rowsPerPage: ItemsPerPage);
+
+    int perPage = 10;
+
+
+}
+
+<div class="page-header">
+
+    <h1>@Html.Raw(term_name)</h1>
+    <ol class="breadcrumb">
+        <li><a href="~/">Trang chủ</a></li>
+        <li class="active"><a href="~/c/@term_name">@Html.Raw(term_name)</a></li>        
+    </ol>
+</div>
+<!-- bage header End -->
+<!-- data Start -->
+<section>
+    <div class="row ">
+        <!-- left sec Start -->
+        <div class="col-md-11 col-sm-11">
+            <div class="row">
+
+                @if (cat_name != null && posts != null)
+                {
+                    var grid = new WebGrid(null,
+                               defaultSort: "",
+                               rowsPerPage: perPage,
+                               selectionFieldName: "SearchString",
+                               ajaxUpdateContainerId: "agrid",
+                               sortFieldName: "SortColumn",
+                               sortDirectionFieldName: "SortOrder");
+                    grid.Bind(posts, autoSortAndPage: true, rowCount: posts.Count());
+                    
+                    if (grid != null)
+                    {
+                        foreach (var p in grid.Rows)
+                        {
+                            var post = p.Value;
+                            dynamic cat = BlogService.GetCategoryByPostName(post.Name, "category");
+                            string Category = string.Empty;
+                            string CategoryURLFriendly = string.Empty;
+
+                            if (cat != null)
+                            {
+                                CategoryURLFriendly = cat.Slug;
+                                Category = cat.CategoryName;
+                            }
+                            <div class="sec-topic col-sm-16 wow fadeInDown animated " data-wow-delay="0.5s">
+                                <div class="row">
+                                    <div class="col-sm-7">
+                                        <img alt="@post.Title" src="~/thumbnail/@post.PostID?size=1000x606" class="img-thumbnail" />
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <div class="sec-info">
+                                            <h3>
+                                                <a href="~/blog/@post.Name">@Html.Raw(post.Title)</a>
+                                            </h3>
+                                            <div class="text-danger sub-info-bordered">
+                                                <div class="time">
+                                                    <span class="ion-android-data icon"></span>
+                                                    @Html.Raw(Convert.ToDateTime(post.Created).ToString("dd MMM yyyy hh:mm"))
+                                                </div>
+                                                <div class="comments">
+                                                    <span class="ion-chatbubbles icon"></span>
+                                                    @post.CommentCount
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="entry-content">
+                                            @Html.Raw(post.Excerpt)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        <div class="col-sm-16">
+                            <hr>
+                            @if (grid.TotalRowCount > perPage)
+                            {
+                                @grid.PagerList(WebGridPagerModes.All, paginationStyle: "pagination pagination-small pagination-right")
+                            }
+                        </div>
+
+                    }
+                }
+                else
+                {
+                    Response.Redirect("~/error/");
+                }
+
+                
+            </div>
+        </div>
+        <!-- left sec End -->
+        @RenderPage(Functions.GetFilePath("sidebar/sidebar-right"))
+    </div>
+
+</section>
+<!-- Data End -->

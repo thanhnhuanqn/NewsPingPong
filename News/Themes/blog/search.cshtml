@@ -1,0 +1,104 @@
+﻿@using News.Models;
+@using News.Data;
+@using News.Areas.Admin.Models;
+@{
+    
+    IEnumerable<dynamic> posts = Model;
+
+    OptionModel.TitleCurrent = "Search: " + Request.Unvalidated["search"];
+    
+    //var grid = new WebGrid(source: posts, rowsPerPage: ItemsPerPage);
+
+    int perPage = Convert.ToInt32(OptionModel.GetOption("blog_per_page") ?? 10);
+
+
+}
+
+<div class="page-header">
+
+    <h1>Từ khóa: @Html.Encode(Request.Unvalidated["search"])</h1>    
+</div>
+<!-- bage header End -->
+<!-- data Start -->
+<section>
+    <div class="row ">
+        <!-- left sec Start -->
+        <div class="col-md-11 col-sm-11">
+            <div class="row">
+                @if (posts != null)
+                {
+                    var grid = new WebGrid(null,
+                               defaultSort: "",
+                               rowsPerPage: perPage,
+                               selectionFieldName: "SearchString",
+                               ajaxUpdateContainerId: "agrid",
+                               sortFieldName: "SortColumn",
+                               sortDirectionFieldName: "SortOrder");
+                    grid.Bind(posts, autoSortAndPage: true, rowCount: posts.Count());
+
+                    if (grid != null)
+                    {
+                        foreach (var p in grid.Rows)
+                        {
+                            var post = p.Value;
+                            dynamic cat = BlogService.GetCategoryByPostName(post.Name, "category");
+                            string Category = string.Empty;
+                            string CategoryURLFriendly = string.Empty;
+
+                            if (cat != null)
+                            {
+                                CategoryURLFriendly = cat.Slug;
+                                Category = cat.CategoryName;
+                            }
+                            <div class="sec-topic col-sm-16 wow fadeInDown animated " data-wow-delay="0.5s">
+                                <div class="row">
+                                    <div class="col-sm-7">
+                                        <img alt="@post.Title" src="~/thumbnail/@post.PostID?size=1000x606" class="img-thumbnail" />
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <div class="sec-info">
+                                            <h3>
+                                                <a href="~/blog/@post.Name">@Html.Raw(post.Title)</a>
+                                            </h3>
+                                            <div class="text-danger sub-info-bordered">
+                                                <div class="time">
+                                                    <span class="ion-android-data icon"></span>
+                                                    @Html.Raw(Convert.ToDateTime(post.Created).ToString("dd MMM yyyy hh:mm"))
+                                                </div>
+                                                <div class="comments">
+                                                    <span class="ion-chatbubbles icon"></span>
+                                                    @post.CommentCount
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="entry-content">
+                                            @Html.Raw(post.Excerpt)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        <div class="col-sm-16">
+                            <hr>
+                            @if (grid.TotalRowCount > perPage)
+                            {
+                                @grid.PagerList(WebGridPagerModes.All, paginationStyle: "pagination pagination-small pagination-right")
+                            }
+                        </div>
+
+                    }
+                }
+                else
+                {
+                    Response.Redirect("~/error/");
+                }
+
+
+            </div>
+        </div>
+        <!-- left sec End -->
+        @RenderPage(Functions.GetFilePath("sidebar/sidebar-right"))
+    </div>
+
+</section>
+<!-- Data End -->

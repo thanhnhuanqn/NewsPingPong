@@ -1,0 +1,205 @@
+﻿@model News.Data.Posts
+@using News.Areas.Admin.Models
+@using News.Data
+
+@using Santhos.Web.Mvc.BootstrapFlashMessages
+@{
+    ViewBag.Title = "Edit post";
+
+    var dateM = Model.Modified;
+
+    //set date post
+    int month = dateM.Value.Month;
+    int day = dateM.Value.Day;
+    int year = dateM.Value.Year;
+
+    int hour = dateM.Value.Hour;
+    int minutes = dateM.Value.Minute;
+}
+<div class="row">
+    <div class="col-lg-12">
+        <h3>Edit Post <a href="~/Admin/Post/Create" class="btn btn-xs btn-success">Add new</a> </h3>
+    </div>
+    <div class="col-lg-12">
+        @Html.FlashMessages(true)
+    </div>
+    <form name="post" method="post" action="~/admin/post/edit">
+        @AntiForgery.GetHtml()
+        @Html.ValidationSummary(true)
+        <div class="col-md-9">
+            <input id="Type" name="Type" type="hidden" value="@Model.Type">
+            <input id="UserID" name="UserID" type="hidden" value="@Model.UserID">
+            <input id="PostID" name="PostID" type="hidden" value="@Model.PostID">
+            <div class="form-group">
+                <label>Title</label>
+                <div>
+                    <input class="form-control" placeholder="Enter title here" type="text" name="Title" value="@Model.Title"/>
+                    @Html.ValidationMessage("Title")
+                </div>
+            </div>
+            <div class="form-group ">
+                <label>Excerpt</label>
+                <div>
+                    <textarea class="form-control" name="Excerpt">@Model.Excerpt</textarea>
+                    @Html.ValidationMessage("Excerpt")
+
+                </div>
+            </div>
+            <div class="form-group ">
+                <label>Content</label>
+                <div>
+                    <textarea id="Content" class="form-control" name="Content">@Model.Content</textarea>
+                    @Html.ValidationMessage("Content")
+                </div>
+            </div>
+
+
+            <div class="form-group ">
+                <label>Slug</label>
+                <div>
+                    <input class="form-control" type="text" name="Name" value="@Model.Name" placeholder="Auto-generate from title" />
+                    @Html.ValidationMessage("Name")
+                </div>
+            </div>
+
+            <div class="form-group ">
+                <label>Keyword</label>
+                <div>
+                    <input class="form-control" type="text" name="keyword" value="@PostMetaModel.GetMetaKey(Model.PostID, "_keyword")" />
+                    @Html.ValidationMessage("keyword")
+                </div>
+            </div>
+
+            <div class="form-group ">
+                <label>Description</label>
+                <div>
+                    <textarea class="form-control" name="description">@PostMetaModel.GetMetaKey(Model.PostID, "_description")</textarea>
+                    @Html.ValidationMessage("description")
+                </div>
+            </div>
+
+            <div class="form-group ">
+                <label></label>
+                <div>
+                    <input class="btn btn-primary" type="submit" value="Update" />
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="accordion-container">
+                <h4>Publish</h4>
+                <div id="sticky-span">
+                    @{
+                        var stick = PostMetaModel.GetMetaKey(Model.PostID, "_sticky");
+                        var checkSticky = string.Empty;
+                        if (stick == "sticky")
+                        {
+                            checkSticky = "checked=\"checked\"";
+                        }
+                    }
+                    <input id="sticky" name="sticky" type="checkbox" value="sticky" @checkSticky>
+                    <label for="sticky" class="selectit">Stick this post</label><br>
+                </div>
+                <div id="statusPost" class="form-group">                    
+                    <label for="post_status">Visibility</label>
+                    @PostHelpers.SelectStatus(Model.Status)
+                </div>
+                <div id="visibilityPost" class="form-group">
+                    <label>Publish</label>
+                    <div>
+                        @PostHelpers.DisplayMonth(month)
+                        <input type="text" value="@day" name="dd" style="width:20px;" />,
+                        <input type="text" value="@year" name="yy" style="width:35px;" /> @@
+                        <input type="text" value="@hour" name="hh" style="width:20px;" /> :
+                        <input type="text" value="@minutes" name="mi" style="width:20px;" />
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-container">
+                <div class="form-group">
+                    <h4>Categories</h4>
+                    @PostHelpers.DisplayMenuPost(ViewBag.Categories, Model.Category)
+                    @Html.ValidationMessage("Categories")
+                </div>
+            </div>
+            <div class="accordion-container">
+                <div class="form">
+                    <h4>Tags</h4>
+                    <input type="text" name="tags" class="form-control" autocomplete="off" value="@PostHelpers.LoadTagForEdit(Model.Category, Model.Name)">
+                    <p class="description">Separate tags with commas</p>
+                </div>
+            </div>
+
+            <div class="accordion-container">
+                <div class="form">
+                    <h4>Featured Image</h4>
+                    @{
+                    string t = PostMetaModel.GetMetaKey(Model.PostID, "_thumbnail_id");
+                <div id="imageDaChon" class="thumbnail">
+                    @if (t != null)
+                        {
+                            Posts post_image = PostModel.Get(Convert.ToInt32(t));
+                            if (post_image != null)
+                            {
+                        <img alt="@post_image.Name" src="/uploads/medium/@post_image.GUID" />
+                        <input type="hidden" name="image-choose" value="@post_image.PostID" />
+                            }
+                        }
+
+                </div>
+                    }
+                    @RenderPage("~/Areas/Admin/Views/Post/_featuredImage.cshtml")
+                </div>
+            </div>
+
+
+        </div>
+    </form>
+</div>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="~/Scripts/gepapixel.js"></script>
+
+    <script src="~/Scripts/ckeditor/ckeditor.js"></script>
+    <script src="~/Scripts/ckfinder/ckfinder.js"></script>
+
+    <script type="text/javascript">
+        $(function () {
+            $('.chooseimage').click(function (e) {
+                e.preventDefault();
+                $('div').removeClass('choose-image-border');
+
+                $('img').removeClass('chon-hinh-nay');
+
+                var id = "#image-" + $(this).attr("id");
+                $(id).addClass("choose-image-border");
+                $(this).addClass("chon-hinh-nay");
+            });
+
+            $('.chooseimage').dblclick(function (e) {
+                e.preventDefault();
+                var t = $('.chon-hinh-nay').attr("alt");
+                var file = '<img alt = "' + t + '" src="/uploads/medium/' + t + '"/>';
+
+                file += '<input type = "hidden" name="image-choose" value = "' + $('.chon-hinh-nay').attr("id") + '"/>';
+
+                $('#imageDaChon').html(file);
+            });
+
+
+            $('#get_image_file_path').click(function (e) {
+                e.preventDefault();
+                var t = $('.chon-hinh-nay').attr("alt");
+                var file = '<img alt = "' + t + '" src="/uploads/medium/' + t + '"/>';
+
+                file += '<input type = "hidden" name="image-choose" value = "' + $('.chon-hinh-nay').attr("id") + '"/>';
+
+                $('#imageDaChon').html(file);
+            });
+
+        })
+    </script>
+}
+
+

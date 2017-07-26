@@ -1,0 +1,30 @@
+﻿@using News.Models;
+@using News.Data;
+@{
+    var posts = QueryModel.GetPostsHot("mobile", 1);
+
+    if (posts != null)
+    {
+        foreach (var item in posts)
+        {
+            <a href="~/blog/@item.Name">
+                <div class="box">
+                    <div class=" carousel-caption">@item.Title</div>
+                    <img class="match-height" src="~/thumbnail/@item.PostID?size=236x480" alt="@item.Title" />
+                    <div class="overlay"></div>
+                    <div class="overlay-info">
+                        <div class="cat">
+                            <p class="cat-data"><span class="ion-android-data"></span>Hot</p>
+                        </div>
+                        <div class="info">
+                            <p>
+                                <span class="ion-android-data"></span>@Html.Raw(Convert.ToDateTime(item.Created).ToString("dd MMM yyyy"))
+                                <span class="ion-chatbubbles"></span>@item.CommentCount
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        }
+    }
+}

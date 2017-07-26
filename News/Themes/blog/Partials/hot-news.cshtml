@@ -1,0 +1,17 @@
+﻿@using News.Models;
+@using News.Data;
+@{
+    var hot_new = QueryModel.GetTitleHotNews(10);
+
+    <ul id="js-news" class="js-hidden">
+        @if (hot_new != null)
+        {
+            foreach (var item in hot_new)
+            {
+                <li class="news-item">
+                    <a href="~/blog/@item.Name">@item.Title</a>
+                </li>
+            }
+        }
+    </ul>
+}

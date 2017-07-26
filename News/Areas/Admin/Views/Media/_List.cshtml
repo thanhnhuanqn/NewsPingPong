@@ -1,0 +1,67 @@
+﻿@using News.Areas.Admin.Models
+@{
+    ViewBag.Title = "Library";
+    //for list post
+    var search = Request["search"];
+    
+    var posts = PostModel.GetAll(orderby: "Created", type: "attachment");
+    
+    if (!search.IsEmpty())
+    {
+        posts = PostModel.GetAll(orderby: "Created", type: "attachment", search: search);
+    }
+    var grid = new WebGrid(source: posts, rowsPerPage: 15);
+}
+
+@RenderPage("~/Areas/Admin/Views/Media/_formUpload.cshtml")
+<div class="col-lg-12">
+    <form method="post">
+        <input type="hidden" value="batchAction" name="mode" />
+        @AntiForgery.GetHtml()
+        <div class="tablenav">
+            <div class="pull-left">
+                <div class="dropdown">
+                    <button class="btn btn-default" type="button" id="dd-menu" data-toggle="dropdown">
+                        Action <span class="caret"></span>
+                    </button>
+
+                    <div class="dropdown-menu" role="menu">
+                        <div role="presentation">
+                            <a href="~/admin/post/new" class="btn btn-link">
+                                <span class="glyphicon glyphicon-new-window"></span> Add new
+                            </a>
+                        </div>
+
+                        <div role="presentation">
+                            <button class="btn btn-link" type="submit" value="btnDelAll" id="deleteActionRun" role="menuitem" tabindex="-1">
+                                <span class="glyphicon glyphicon-remove"></span> Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pull-right">
+                <div class="form-inline">
+
+                </div>
+            </div>
+        </div>
+        @{
+
+            @grid.GetHtml(tableStyle: "table table-hover widefat",
+    columns:
+    grid.Columns(
+                grid.Column(format: @<input type="checkbox" name="actionDelete" value="@item.PostID" />, style: "check-column"),
+                grid.Column(format: @<a href="#@item.Name" title="Edit @item.Title"><img src="~/uploads/thumb/@item.guid" alt="@item.Title" height="60" width="60"></a>, style:"column-icon media-icon image-icon"),
+                grid.Column(format: @<a href="#@item.Name">@item.Title</a>, header: "Title", columnName: "post_title"),                
+                grid.Column(format: @<text>@PostHelpers.FormatDatePost(item)</text>, header: "Date", columnName: "Created")
+                                                 ),
+                                                 firstText: "First",
+                                                 lastText: "Last",
+                                                 nextText: "Next",
+                                                 previousText: "Previous",
+                                                 mode: WebGridPagerModes.All
+                                                 )
+        }
+    </form>
+</div>

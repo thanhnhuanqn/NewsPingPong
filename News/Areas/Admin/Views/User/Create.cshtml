@@ -1,0 +1,98 @@
+﻿@model News.Data.Users
+@using Santhos.Web.Mvc.BootstrapFlashMessages
+@using News.Data
+@using News.Areas.Admin.Models;
+
+@{
+    ViewBag.Title = "Create an account";    
+}
+<div class="row">
+    <div class="col-md-12">
+        @Html.FlashMessages(true)
+        <h3 id="add-new-user">Add New User</h3>
+        <p class="description">Create a brand new user and add them to this site.</p>
+        <br />
+        <form method="post" class="form-horizontal" actions="~/admin/user/create">
+            @AntiForgery.GetHtml()
+            <input type="hidden" value="new" name="form-register" />
+            @Html.ValidationSummary()
+
+            <div class="form-group">
+                <label for="username" class="col-md-3">Username (required)</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="text" id="UserName" name="UserName" value="" />
+                    @Html.ValidationMessage("UserName")
+                </div>
+            </div>
+            <br />
+
+            <div class="form-group">
+                <label for="email" class="col-md-3">E-mail (required)</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="text" id="email" name="email" value="" />
+                    @Html.ValidationMessage("email")
+                </div>
+            </div>
+            <br />
+            <div class="form-group">
+                <label for="firstname" class="col-md-3">First Name</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="text" id="firstname" name="firstname" value="" />
+                    @Html.ValidationMessage("firstname")
+                </div>
+            </div>
+            <br />
+            <div class="form-group">
+                <label for="lastname" class="col-md-3">Last Name</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="text" id="lastname" name="lastname" value="" />
+                    @Html.ValidationMessage("lastname")
+                </div>
+            </div>
+            <br />
+            <div class="form-group">
+                <label for="lastname" class="col-md-3">Website</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="text" id="website" name="website" value="" />
+                    @Html.ValidationMessage("website")
+                </div>
+            </div>
+            <br />
+            <div class="form-group">
+                <label for="password" class="col-md-3">Password (required)</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="password" id="password" name="password" />
+                    @Html.ValidationMessage("password")
+                </div>
+            </div>
+            <br />
+            <div class="form-group">
+                <label for="password2" class="col-md-3">Repeat Password (required)</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="password" id="password2" name="password2" value="" />
+                    @Html.ValidationMessage("password2")
+                </div>
+            </div>
+            <br />
+            <div class="form-group">
+                <label for="role" class="col-md-3">Role</label>
+                <div class="col-md-2">
+                    <select name="role" class="form-control">
+                        @foreach (var itemRole in RoleModel.GetAllRoles())
+                        {
+                            <option>@itemRole.RoleName</option>
+                        }
+                    </select>
+                    @Html.ValidationMessage("role")
+                </div>
+            </div>
+            <br />
+
+            <div class="form-group">
+                <div class="col-md-3">
+                    <input class="btn btn-primary" type="submit" name="Submit" value="Register" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

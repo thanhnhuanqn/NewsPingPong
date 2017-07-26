@@ -1,0 +1,15 @@
+﻿@*@RenderPage(SiteFunction.GetFilePath("box/hot"))
+<br />*@
+<div class="row ">
+    <!-- left sec Start -->
+    <div class="col-md-11 col-sm-11">
+        <div class="row">
+            @RenderPage(Functions.GetFilePath("box/box-1"))
+            @RenderPage(Functions.GetFilePath("box/box-2"))
+            @RenderPage(Functions.GetFilePath("box/box-3"))
+            @RenderPage(Functions.GetFilePath("box/adv"))
+        </div>
+    </div>
+    <!-- left sec End -->
+    @RenderPage(Functions.GetFilePath("sidebar/sidebar-right"))
+</div>

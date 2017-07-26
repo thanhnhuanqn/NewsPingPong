@@ -1,0 +1,10 @@
+diff a/App_Code/BlogHelper.cshtml b/App_Code/BlogHelper.cshtml	(rejected hunks)
+@@ -138,7 +138,7 @@
+ @helper GetCategoryName(string cat_name)
+ {
+ 
+-    var category = CategoryService.GetCategoryName(cat_name);
++    var category = BlogService.GetCategoryName(cat_name);
+ 
+     if (category != null)
+     {

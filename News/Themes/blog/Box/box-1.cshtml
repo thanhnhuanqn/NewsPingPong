@@ -1,0 +1,120 @@
+﻿@using News.Models;
+@using News.Data;
+@{
+    var category_name = "internet";
+}
+<!-- Danh-Gia start -->
+<div class="col-sm-16 business  wow fadeInDown animated" data-wow-delay="1s" data-wow-offset="50">
+    <div class="main-title-outer pull-left">
+        <div class="main-title">@Html.Raw(BlogHelper.GetCategoryName(category_name))</div>
+    </div>
+    <div class="row">
+        <div class="col-md-11 col-sm-16">
+            <div class="row">
+                @{
+                    dynamic posts = BlogService.GetPostsByCategory(slug: category_name, take: 5);
+                    if (posts != null)
+                    {
+                        int i = 1;
+
+                        foreach (var item in posts)
+                        {
+                            <div class="col-md-8 col-sm-9 col-xs-16">
+                                <div class="topic">
+                                    <a href="~/blog/@item.Name">
+                                        <img alt="@item.Title" src="~/thumbnail/@item.PostID?size=600x398" class="img-thumbnail" />
+                                        <h3>@Html.Raw(item.Title)</h3>
+                                        <div class="text-danger sub-info-bordered">
+                                            <div class="time"><span class="ion-android-data icon"></span>@Html.Raw(Convert.ToDateTime(item.Created).ToString("dd MMM yyyy"))</div>
+                                            <div class="comments">
+                                                <span class="ion-chatbubbles icon"></span>
+                                                <span class="fb-comments-count" data-href="http://@Request.Url.Authority/blog/@item.Name"></span>
+                                            </div>
+
+                                        </div>
+                                    </a>
+                                    <p>
+                                        @Html.Raw(item.Excerpt)
+                                    </p>
+                                </div>
+                            </div>
+                            break;
+                        }
+                        <div class="col-md-8 col-sm-7 col-xs-16">
+                            <ul class="list-unstyled">
+                                @foreach (var item in posts)
+                                {
+                                    if (i == 1)
+                                    {
+                                        i++;
+                                        continue;
+                                    }
+
+                                    <li>
+                                        <a href="~/blog/@item.Name">
+                                            <div class="row">
+                                                <div class="col-sm-5 hidden-sm hidden-md">
+                                                    <img alt="@item.Title" src="~/thumbnail/@item.PostID?size=76x76" class="img-thumbnail pull-left" />
+                                                </div>
+                                                <div class="col-sm-16 col-md-16 col-lg-11">
+                                                    <h4>@Html.Raw(item.Title)</h4>
+                                                    <div class="text-danger sub-info">
+                                                        <div class="time"><span class="ion-android-data icon"></span>@Html.Raw(Convert.ToDateTime(item.Created).ToString("dd MMM yyyy"))</div>
+                                                        <div class="comments">
+                                                            <span class="ion-chatbubbles icon"></span>
+                                                            <span class="fb-comments-count" data-href="@Request.Url.AbsoluteUri/blog/@item.Name"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+        <div class="col-md-5 col-sm-16 hidden-sm hidden-xs">
+            <div id="vid-thumbs" class="owl-carousel">
+                @{
+                    var news = BlogService.GetPostsByCategory("video", 6).ToArray();
+                    if (news != null)
+                    {
+                        for (var i = 0; i < news.Count(); i += 2)
+                        {
+                            <div class="item">
+                                <div class="vid-thumb-outer">
+                                    <div class="vid-thumb">
+                                        <a class="popup-youtube" href="@news[i].Excerpt">
+                                            <div class="vid-box">
+                                                <span class="ion-ios7-film"></span>
+                                                <img class="img-thumbnail img-responsive" src="~/thumbnail/@news[i].PostID?size=250x143" alt="@news[i].Title" />
+                                            </div>
+                                            <h4>@Html.Raw(news[i].Title)</h4>
+                                        </a>
+                                    </div>
+                                    @if ((i + 1) < news.Count())
+                                    {
+                                        <div class="vid-thumb">
+                                            <a class="popup-youtube" href="@news[i+1].Excerpt">
+                                                <div class="vid-box">
+                                                    <span class="ion-ios7-film"></span>
+                                                    <img class="img-thumbnail img-responsive" src="~/thumbnail/@news[i+1].PostID?size=250x143" alt="@news[i+1].Title" />
+                                                </div>
+                                                <h4>@Html.Raw(news[i + 1].Title)</h4>
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                    }
+                }
+            </div>
+        </div>
+    </div>    
+</div>
+<!-- Danh-Gia end -->

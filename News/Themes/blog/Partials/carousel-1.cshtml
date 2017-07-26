@@ -1,0 +1,45 @@
+﻿@using News.Models;
+@using News.Data;
+@{
+    var posts = QueryModel.GetPostsHot("may-tinh-bang", 7);
+    if (posts != null)
+    {
+        <div id="sync1" class="owl-carousel">
+            @{
+                foreach (var item in posts)
+                {
+                    <div class="box item">
+                        <a href="~/blog/@item.Name">
+                            <div class="carousel-caption">@item.Title</div>
+                            <img class="img-responsive" src="~/thumbnail/@item.PostID?size=1600x972" alt="@item.Title" />
+                            <div class="overlay"></div>
+                            <div class="overlay-info">
+                                <div class="cat">
+                                    <p class="cat-data"><span class="ion-android-data"></span>Hot</p>
+                                </div>
+                                <div class="info">
+                                    <p>
+                                        <span class="ion-android-data"></span>@Html.Raw(Convert.ToDateTime(item.Created).ToString("dd MMM yyyy"))
+                                        <span class="ion-chatbubbles"></span>@item.CommentCount
+                                    </p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                }
+            }
+        </div>
+        <div class="row">
+            <div id="sync2" class="owl-carousel">
+                @{
+                    foreach (var item in posts)
+                    {
+                        <div class="item">
+                            <img class=" img-responsive" src="~/thumbnail/@item.PostID?size=1600x972" alt="@item.Title" />
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    }
+}

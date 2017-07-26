@@ -1,0 +1,126 @@
+﻿@using News.Areas.Admin.Models
+
+@{
+    string activeCSS = WebPageContext.Current.Page.Request.RawUrl;
+    string user_url = string.Empty;// WebSecurity.CurrentUserName ?? UrlData[0];
+    var action_url = Request.RawUrl;    
+}
+
+@helper Active(string action, string cssClass)
+{
+    var hasAction = action.Split(',').Select(t => t.Trim()).ToList();
+
+    string activeCSS = WebPageContext.Current.Page.Request.RawUrl.ToLower();
+
+    foreach (var item in hasAction)
+    {
+        if (activeCSS.Contains(item))
+        {
+            @cssClass
+            break;
+        }
+    }
+}
+
+
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+
+    <div class="navbar-header">
+        <button class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+            <span class="sr-only">Toogle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand">@OptionModel.BlogName</a>
+    </div>
+    <div class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+            <li><a href="~/admin">Dashboard</a></li>
+            <li><a href="~/" target="_blank">View site</a></li>
+        </ul>
+        <div class="container-fluid">
+            <ul class="nav navbar-right top-nav">
+                <li class="dropdown">
+                    <button class="btn dropdown-toggle navbar-btn btn-link" type="button" data-toggle="dropdown">
+                        Howdy, @SecurityModel.CurrentUserName
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu">
+                        <li role="presentation"><a href="~/admin/user/edit/@SecurityModel.CurrentUserName" role="menuitem" tabindex="-1">Profile</a></li>
+                        <li role="presentation"><a href="~/admin/account/logout" role="menuitem" tabindex="-1">Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+
+    <div class="collapse navbar-collapse navbar-ex1-collapse">
+        <ul class="nav navbar-nav side-nav">
+            <li>
+                <a href="javascript:;" data-toggle="collapse" data-target="#post" class="@Active("admin/post/, admin/post/create, admin/post/edit, admin/tag/create, admin/tag/index, admin/tag/edit, admin/category", "selected")">
+                    <i class="glyphicon glyphicon-book"></i> Posts <i class="caret"></i>
+                </a>
+                <ul id="post" class="collapse @Active("admin/post/, admin/post/create, admin/post/edit, admin/tag/create, admin/tag/edit, admin/tag/index, admin/category", "in")">
+                    <li><a class="@Active("admin/post/index, admin/post/edit", "active")" href="~/admin/post/index">All Posts</a></li>
+                    <li><a class="@Active("admin/post/create", "active")" href="~/admin/post/create">Add New</a></li>
+
+                    <li><a class="@Active("admin/category/index, admin/category/create, admin/category/edit", "active")" href="~/admin/category/">Categories</a></li>
+                    <li><a class="@Active("admin/tag/index, admin/tag/edit", "active")" href="/admin/tag/index">Tags</a></li>
+
+                </ul>
+            </li>
+
+            <li>
+                <a class="@Active("page/index, page/create, page/edit", "selected")" href="javascript:;" data-toggle="collapse" data-target="#page"><i class="glyphicon glyphicon-cloud"></i> Pages <i class="caret"></i></a>
+                <ul id="page" class="collapse @Active("page/index, page/create, page/edit", "in")">
+                    <li><a class="@Active("page/index, page/edit", "active")" href="~/admin/page/index">All Pages</a></li>
+                    <li><a class="@Active("page/create", "active")" href="~/admin/page/create">Add New</a></li>
+                </ul>
+            </li>
+
+            <li class="gp-menu-name">
+                <a class="@Active("comment/index, comment/edit", "selected")" href="~/admin/comment/index"><i class="glyphicon glyphicon-comment"></i> Comments </a>
+            </li>
+
+            <li class="gp-menu-name">
+                <a class="@Active("theme/index, menu, admin/editor", "selected")" href="javascript:;" data-toggle="collapse" data-target="#Appearance"><i class="glyphicon glyphicon-eye-open"></i> Appearance <i class="caret"></i></a>
+                <ul id="Appearance" class="collapse @Active("theme/index, menu, admin/editor", "in")">
+                    <li><a class="@Active("admin/theme/index", "active")" href="~/admin/theme/index">Themes</a></li>
+                    <li><a class="@Active("admin/menu/index", "active")" href="~/admin/menu/index">Menu</a></li>
+                    <li><a class="@Active("admin/editor/index", "active")" href="~/admin/editor/index">Editor</a></li>
+                </ul>
+            </li>
+
+
+            <li class="gp-menu-name">
+                <a class="@Active("account, manager, role, user, profile", "selected")" href="javascript:;" data-toggle="collapse" data-target="#Users"><i class="glyphicon glyphicon-user"></i> Users <i class="caret"></i></a>
+                <ul id="Users" class="collapse @Active("manage, account, role, user, profile", "in")">
+
+                    <li><a class="@Active("admin/role/index", "active")" href="~/admin/role/index">All Users</a></li>
+                    <li><a class="@Active("admin/user/index/", "active")" href="~/admin/user/index/">Add User</a></li>
+                </ul>
+            </li>
+
+            <li class="gp-menu-name">
+                <a class="@Active("media/index, media/edit, media/create, media?mode", "selected")" href="javascript:;" data-toggle="collapse" data-target="#Media"><i class="glyphicon glyphicon-music"></i> Media <i class="caret"></i></a>
+                <ul id="Media" class="collapse @Active("media/index, media/edit, media/create, media?mode", "in")">
+                    <li><a class="@Active("media/index, media?mode, media/edit", "active")" href="~/admin/media/index">Library</a></li>
+                </ul>
+            </li>
+
+            <li class="gp-menu-name">
+                <a class="@Active("option/media, option/general, option/discussion, option/serverinfo", "selected")" href="javascript:;" data-toggle="collapse" data-target="#Settings"><i class="glyphicon glyphicon-star"></i> Settings <i class="caret"></i></a>
+                <ul id="Settings" class="collapse @Active("option/media, option/general, option/discussion, option/serverinfo", "in")">
+                    <li><a class="@Active("option/general", "active")" href="~/admin/option/general">General</a></li>
+                    @*<li><a class="@Active("option/discussion", "active")" href="~/admin/option/discussion ">Discussion</a></li>*@
+                    <li><a class="@Active("option/media", "active")" href="~/admin/option/media">Media</a></li>
+                    <li><a class="@Active("option/serverinfo", "active")" href="~/admin/option/serverinfo">Server Info</a></li>
+                </ul>
+            </li>
+
+        </ul>
+
+    </div>
+</nav>

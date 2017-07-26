@@ -1,0 +1,140 @@
+﻿@using News.Models;
+@using News.Data;
+@using News.Areas.Admin.Models;
+@{
+    Posts post = (Posts)Model;
+
+    string CategoryURLFriendly = string.Empty;
+}
+
+<div class="wrapper">
+    @if (post != null)
+    {
+        //Tạo tiêu đề cho trang web <title></title>
+        OptionModel.TitleCurrent = post.Title;
+            <!-- bage header End -->
+            <!-- data Start -->
+        <div class="row ">
+            <!-- left sec Start -->
+            <div class="col-md-11 col-sm-11">
+                <div class="row">
+                    <!-- post details start -->
+                    <div class="col-sm-16">
+                        <div class="row">
+                            <div class="col-sm-16">
+                                <div class="page-header">
+                                    @RenderPage(Functions.GetFilePath("partials/breadcrumbs"), post.Name)
+                                    <h1>
+                                        @Html.Raw(post.Title)
+                                    </h1>
+                                    @*<div class="fb-save" data-uri="@Request.Url"></div>*@
+                                    <div class="fb-like" data-href="@Request.Url" data-layout="standard" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+                                    <!-- Go to www.addthis.com/dashboard to customize your tools -->
+                                    <div class="addthis_sharing_toolbox"></div>
+                                </div>
+                            </div>
+                            <div class="sec-topic col-sm-16  wow fadeInDown animated " data-wow-delay="0.5s">
+                                <div class="row">
+                                    @if (post != null)
+                                    {
+                                        Users Author = UserModel.Get((int)post.UserID);
+                                        var AuthorName = string.Empty;
+                                        if (Author != null)
+                                        {
+                                            var niceName = UserModel.GetUserMetaKey((int)Author.UserID, "nickname");
+
+                                            if (!string.IsNullOrEmpty(niceName))
+                                            {
+                                                AuthorName = niceName;
+                                            }
+                                            else
+                                            {
+                                                AuthorName = Author.UserName;
+                                            }
+                                        }
+
+                                        var Catego = BlogService.GetCategoryByPostName(post.Name, "category");
+
+                                        var Category = string.Empty;
+
+                                        if (Catego != null)
+                                        {
+                                            CategoryURLFriendly = Catego.Slug;
+                                            Category = Catego.CategoryName;
+                                            Page.Title = Category + " - " + post.Title;
+
+                                        }
+                                        <div class="col-sm-16 sec-info">
+                                            <div class="text-danger sub-info-bordered">
+                                                <div class="author">
+                                                    <span class="ion-person icon"></span>
+                                                    By: @AuthorName
+                                                </div>
+                                                <div class="time">
+                                                    <span class="ion-android-data icon"></span>
+                                                    @Html.Raw(Convert.ToDateTime(post.Created).ToString("dd MMM yyyy"))
+                                                </div>
+                                                <div class="comments">
+                                                    <span class="ion-chatbubbles icon"></span>
+                                                    <span class="fb-comments-count" data-href="@Request.Url"></span>
+                                                </div>
+                                            </div>
+                                            <div class="content-main">
+                                                @Html.Raw(post.Content)
+                                            </div>                                            
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            <div class="col-sm-16">
+                                <div class="tags">
+                                    @TagsPost(BlogService.GetTagsByPost(post.Name))
+                                </div>
+                            </div>
+                            <div class="col-sm-16">
+                                @*
+                                    <div class="main-title-outer pull-left">
+                                        <div class="main-title">leave a comment</div>
+                                    </div>
+                                    <div class="col-xs-16 wow zoomIn animated">
+                                        @RenderPage(Functions.GetFilePath("partials/comment-form"), (int)post.PostID)
+                                    </div>
+                                *@
+                                <div class="col-xs-16 wow zoomIn animated">
+                                    <div class="fb-comments" data-href="@Request.Url" data-numposts="15" data-width="100%"></div>
+                                </div>
+                            </div>
+                            @{ dynamic related = new System.Dynamic.ExpandoObject();
+                                related.Category = CategoryURLFriendly;
+                                related.Name = post.Name;
+                            }
+                            @RenderPage(Functions.GetFilePath("partials/related-topics"), related)
+
+                            @*RenderPage(Functions.GetFilePath("partials/comments"), post)*@
+
+                        </div>
+
+                    </div>
+                    <!-- post details end -->
+
+                </div>
+            </div>
+            <!-- left sec End -->
+            @RenderPage(Functions.GetFilePath("sidebar/sidebar-right"))
+        </div>
+            <!-- Data End -->
+}
+</div>
+
+@helper TagsPost(dynamic tags)
+{
+    if (tags != null)
+    {
+        foreach (var tag in tags)
+        {
+            <a class="tags-item" href="~/xuhuong/@tag.Slug">@tag.CategoryName</a>
+        }
+    }
+}
+<!-- Go to www.addthis.com/dashboard to customize your tools -->
+<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-57b465d73d218d1a"></script>

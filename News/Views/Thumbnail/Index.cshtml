@@ -1,0 +1,113 @@
+﻿@using News.Data;
+@using News.Areas.Admin.Models;
+@{ 
+    // Cache the image for a minute
+    Response.OutputCache(300);
+    var postid = Model;
+    dynamic post_image_id = PostMetaModel.GetMetaKey(postid, "_thumbnail_id");
+
+    if (post_image_id != null)
+    {
+        Posts get_photo = PostModel.Get(int.Parse(post_image_id));
+
+        var size = Request["size"] ?? "";
+
+        var tmp = size.Split('x').ToList();
+
+        var Width = 0;
+        var Height = 0;
+        try
+        {
+            Width = Math.Abs(Convert.ToInt32(tmp.ElementAt(0)));
+            Height = Math.Abs(Convert.ToInt32(tmp.ElementAt(1)));
+
+            if (Width > 4000)
+            {
+                Width = 1024;
+            }
+            if (Height > 4000)
+            {
+                Height = 1024;
+            }
+
+        }
+        catch
+        {
+        }
+        string fileName = get_photo.GUID;
+        string folder = "~/Uploads/";
+
+        var location = Server.MapPath(folder);
+        var path = Path.Combine(location, fileName);
+        System.Drawing.Image image = System.Drawing.Image.FromFile(path);
+
+        System.Drawing.Image finalImage = image;
+
+        System.Drawing.Bitmap bitmap = null;
+
+        try
+        {
+            int left = 0;
+            int top = 0;
+            int srcWidth = Width;
+            int srcHeight = Height;
+
+            bitmap = new System.Drawing.Bitmap(Width, Height);
+
+            double croppedHeightToWidth = (double)Height / Width;
+
+            double croppedWidthToHeight = (double)Width / Height;
+
+            if (image.Width > image.Height)
+            {
+                srcWidth = (int)(Math.Round(image.Height * croppedWidthToHeight));
+                if (srcWidth < image.Width)
+                {
+                    srcHeight = image.Height;
+                    left = (image.Width - srcWidth) / 2;
+                }
+                else
+                {
+                    srcHeight = (int)Math.Round(image.Height * ((double)image.Width / srcWidth));
+                    srcWidth = image.Width;
+                    top = (image.Height - srcHeight) / 2;
+                }
+            }
+            else
+            {
+                srcHeight = (int)(Math.Round(image.Width * croppedHeightToWidth));
+                if (srcHeight < image.Height)
+                {
+                    srcWidth = image.Width;
+                    top = (image.Height - srcHeight) / 2;
+                }
+                else
+                {
+                    srcWidth = (int)Math.Round(image.Width * ((double)image.Height / srcHeight));
+                    srcHeight = image.Height;
+                    left = (image.Width - srcWidth) / 2;
+                }
+            }
+
+            using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(bitmap))
+            {
+                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
+                g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                g.DrawImage(image, new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height), new System.Drawing.Rectangle(left, top, srcWidth, srcHeight), System.Drawing.GraphicsUnit.Pixel);
+            }
+
+            finalImage = bitmap;
+        }
+        catch
+        {
+
+        }
+        MemoryStream ms = new MemoryStream();
+        finalImage.Save(ms, image.RawFormat);
+
+        var img = new WebImage(ms.GetBuffer());
+        img.Resize(Width, Height).Write();
+    }
+}

@@ -1,0 +1,82 @@
+﻿@using News.Areas.Admin.Models
+@using News.Areas.Admin.Controllers.Components;
+@using Santhos.Web.Mvc.BootstrapFlashMessages
+@{
+    ViewBag.Title = "Media Settings";
+
+    int thumbnail_size_w = Request["thumbnail_size_w"].AsInt();
+    int thumbnail_size_h = Request["thumbnail_size_h"].AsInt();
+    int thumbnail_crop = Request["thumbnail_crop"].AsInt();
+    int medium_size_w = Request["medium_size_w"].AsInt();
+    int medium_size_h = Request["medium_size_h"].AsInt();
+    int large_size_w = Request["large_size_w"].AsInt();
+    int large_size_h = Request["large_size_h"].AsInt();
+
+
+    OptionModel.GetOptions();
+    thumbnail_size_w = OptionModel.ThumbnailW;
+    thumbnail_size_h = OptionModel.ThumbnailH;
+    thumbnail_crop = OptionModel.ThumbnailCrop;
+    medium_size_w = OptionModel.MediumW;
+    medium_size_h = OptionModel.MediumH;
+    large_size_w = OptionModel.LargeW;
+    large_size_h = OptionModel.LargeH;
+
+}
+<div class="row">
+    <div class="col-lg-12">
+        <h3 id="add-new-user">Media Settings</h3>
+        <br />
+        @Html.FlashMessages(true)
+        <h4 class="title">Image sizes</h4>
+        <p>The sizes listed below determine the maximum dimensions in pixels to use when adding an image to the Media Library.</p>
+        <br />
+    </div>
+    <div class="col-md-12">
+
+        <form method="post" class="form-horizontal">
+            @Html.ValidationSummary(true)
+
+            <div class="form-group">
+                <label class="col-md-2">Thumbnail size</label>
+                <div class="col-md-10">
+                    <span>Width</span>
+                    <input name="thumbnail_size_w" step="1" min="0" id="thumbnail_size_w" value="@thumbnail_size_w" class="small-text" type="number" />
+                    @Html.ValidationMessage("thumbnail_size_w")
+                    <span>Height</span>
+                    <input name="thumbnail_size_h" step="1" min="0" id="thumbnail_size_h" value="@thumbnail_size_h" class="small-text" type="number" />
+                    <br />
+                    <input name="thumbnail_crop" id="thumbnail_crop" value="@thumbnail_crop" checked="checked" type="checkbox">
+                    <span class="description">Crop thumbnail to exact dimensions (normally thumbnails are proportional)</span>
+                </div>
+            </div>
+            <br />
+            <div class="form-group">
+                <label class="col-md-2">Medium size</label>
+                <div class="col-md-10">
+                    <span>Max Width</span>
+                    <input name="medium_size_w" step="1" min="0" id="medium_size_w" value="@medium_size_w" class="small-text" type="number">
+                    <span>Max Height</span>
+                    <input name="medium_size_h" step="1" min="0" id="medium_size_h" value="@medium_size_h" class="small-text" type="number">
+
+                </div>
+            </div>
+            <br />
+            <div class="form-group">
+                <label class="col-md-2">Large size</label>
+                <div class="col-md-10">
+                    <span>Max Width</span>
+                    <input name="large_size_w" step="1" min="0" id="large_size_w" value="@large_size_w" class="small-text" type="number">
+                    <span>Max Height</span>
+                    <input name="large_size_h" step="1" min="0" id="large_size_h" value="@large_size_h" class="small-text" type="number">
+                </div>
+            </div>
+            <br />
+            <div class="form-group">
+                <div class="col-md-2">
+                    <input class="btn btn-primary" type="submit" name="Submit" value="Save changes" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

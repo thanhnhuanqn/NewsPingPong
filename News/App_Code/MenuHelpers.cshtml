@@ -1,0 +1,169 @@
+﻿@using News.Areas.Admin.Models
+@using News.Data
+
+@helper DisplayPageUl(IEnumerable<Posts> pages, IEnumerable<Posts> pagesChild)
+{
+    <ul>
+        @foreach (var page in pages)
+        {
+            if (page.Parent == 0)
+            {
+                <li><input type="checkbox" name="menu-item-object" value="@page.PostID" /> @page.Title</li>
+                @DisplayPageChildUl(page.PostID, pagesChild, 1)
+            }
+        }
+    </ul>
+
+}
+
+@helper DisplayPageChildUl(decimal idParent, IEnumerable<Posts> pagesChild, int level = 1)
+{
+    string rowPerfix = string.Empty;
+
+    foreach (var page in pagesChild)
+    {
+        if (idParent == page.Parent)
+        {
+            for (int i = 0; i < level; i++)
+            {
+                rowPerfix += "— ";
+            }
+            <li><input type="checkbox" name="menu-item-object" value="@page.PostID" /> @rowPerfix@page.Title</li>
+            level++;
+            @DisplayPageChildUl((int)page.PostID, pagesChild, level);
+            level = level - 1;
+            rowPerfix = string.Empty;
+        }
+    }
+}
+
+/@**
+    Display category for post
+*@
+
+@helper DisplayMenuPost(IEnumerable<Category> categories, IEnumerable<Category> list = null)
+{
+
+    <ul>
+        @foreach (var cat in categories)
+        {            
+            if (cat.CategoryParent == 0)
+            {
+                <li>
+                    @if (list != null)
+                    {
+                        string isChecked = string.Empty;
+                        var inList = list.Where(p => p.CategoryID == cat.CategoryID).SingleOrDefault();
+                        if (inList != null) { isChecked = "checked"; }
+                        <input type="checkbox" name="postCategories" value="@cat.CategoryID" @isChecked /> @cat.CategoryName
+                    }
+                    else
+                    {
+                        <input type="checkbox" name="postCategories" value="@cat.CategoryID" /> @cat.CategoryName
+                    }
+
+                </li>
+                @DisplaySubMenuPost((int)cat.CategoryID, categories, list, 1)
+
+            }
+
+        }
+    </ul>
+}
+
+@helper DisplaySubMenuPost(int id, IEnumerable<Category> categories, IEnumerable<Category> list, int level = 1)
+{
+    string rowPerfix = string.Empty;
+
+    foreach (var cat in categories)
+    {
+        if (id == cat.CategoryParent)
+        {
+            for (int i = 0; i < level; i++)
+            {
+                rowPerfix += "— ";
+            }
+            <li data-level="@level">
+                @if (list != null)
+                {
+                    string isChecked = string.Empty;
+                    var inList = list.Where(p => p.CategoryID == cat.CategoryID).SingleOrDefault();
+                    if (inList != null) { isChecked = "checked"; }
+                    <input type="checkbox" name="postCategories" value="@cat.CategoryID" @isChecked /> @rowPerfix@cat.CategoryName
+                }
+                else
+                {
+                    <input type="checkbox" name="postCategories" value="@cat.CategoryID" /> @rowPerfix@cat.CategoryName
+                }
+
+            </li>
+                level++;
+                //đệ qui
+                @DisplaySubMenuPost((int)cat.CategoryID, categories, list, level);
+                level = level - 1;
+                rowPerfix = string.Empty;
+        }
+
+    }
+}
+
+@helper DisplayTermUl(dynamic terms)
+{    
+    <select name="menu-name-group" class="form-control">
+        @foreach (var term in terms)
+        {
+            <option value="@term.CategoryID"> @term.CategoryName</option>
+        }
+    </select>
+}
+
+
+
+@helper DisplayNavItem(string slug, decimal? postId, decimal? post_parent)
+{
+    var term = TermModel.Get(slug);
+    var items = MenuModel.GetMenuItemByMenuId(term.CategoryID);
+
+    if (items != null)
+    {
+        <select name="nav-item-parent">
+            <option value="0">None</option>
+            @foreach (var item in items)
+            {
+                if (item.PostID != postId)
+                {
+
+                    if (item.PostID == post_parent)
+                    {
+                        <option value="@item.PostID" selected>@item.Title</option>
+                    }
+                    else
+                    {
+                        <option value="@item.PostID">@item.Title</option>
+                    }
+                }
+            }
+        </select>
+    }
+
+}
+
+@helper CustomItemOriginal(int postId)
+{
+    dynamic result = MenuModel.GetOriginalItem(postId);
+
+    if (result.type == "Category")
+    {
+        <a href="~/admin/category/edit/@result.slug">@result.name</a>;
+    }
+
+    if (result.type == "Page")
+    {
+        <a href="~/admin/page/edit/@result.slug">@result.name</a>;
+    }
+
+    if (result.type == "Custom")
+    {
+        <text>Custom</text>
+    }    
+}

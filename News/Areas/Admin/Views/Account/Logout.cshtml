@@ -1,0 +1,16 @@
+﻿@{
+    Page.Title = "Title goes here";
+    //Layout = "Your Layout Page goes here";
+
+    WebSecurity.Logout();
+    var returnUrl = Request.QueryString["ReturnUrl"];
+    if (returnUrl.IsEmpty())
+    {
+        Response.Redirect("~/");
+    }
+    else
+    {
+        Context.RedirectLocal(returnUrl);
+    }
+}
+

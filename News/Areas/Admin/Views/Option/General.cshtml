@@ -1,0 +1,212 @@
+﻿@using News.Areas.Admin.Models
+@using Santhos.Web.Mvc.BootstrapFlashMessages
+
+@{
+    ViewBag.Title = "General Settings";
+
+    var blogname = Request["blogname"];
+
+    var blogdescription = Request["blogdescription"];
+
+    var admin_email = Request["admin_email"];
+
+    var users_can_register = Request["users_can_register"];
+
+    var default_role = Request["default_role"];
+
+    var default_category = Request["default_category"];
+
+    var mailserver_url = Request["mailserver_url"];
+
+    dynamic mailserver_port = Request["mailserver_port"];
+
+    var mailserver_login = Request["mailserver_login"];
+
+    var mailserver_pass = Request["mailserver_pass"];
+
+    var default_email_category = Request["default_email_category"];
+
+    dynamic posts_per_page = Request["posts_per_page"];
+
+
+    blogname = OptionModel.BlogName;
+
+    blogdescription = OptionModel.BlogDescription;
+
+    admin_email = OptionModel.AdminEmail;
+
+    users_can_register = OptionModel.UserCanRegister;
+
+    default_role = OptionModel.DefaultRole;
+
+    default_category = OptionModel.DefaultCategory;
+
+    mailserver_url = OptionModel.MailServerUrl;
+
+    mailserver_port = OptionModel.MailServerPort;
+
+    mailserver_login = OptionModel.MailServerLogin;
+
+    mailserver_pass = OptionModel.MailServerPass;
+
+    default_email_category = OptionModel.DefaultEmailCategory;
+
+    posts_per_page = OptionModel.PostsPerPage;
+
+    dynamic roles = ViewBag.Roles;
+
+}
+<div class="row">
+    <div class="col-md-12">
+        <h3 id="add-new-user">General Settings</h3>
+        <p class="description">Create a brand new user and add them to this site.</p>
+        <br />
+    </div>
+    <div class="col-lg-12">
+        @Html.FlashMessages(true)
+    </div>
+    <div class="col-md-12">
+        <form method="post" class="form-horizontal">
+            @AntiForgery.GetHtml()
+            <input type="hidden" value="new" name="form-register" />
+            @Html.ValidationSummary(true)
+
+            <div class="form-group">
+                <label for="blogname" class="col-md-3">Site Title</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="text" id="blogname" name="blogname" value="@blogname" />
+                    @Html.ValidationMessage("blogname")
+                </div>
+            </div>
+            <br />
+
+            <div class="form-group">
+                <label for="blogdescription" class="col-md-3">Tagline</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="text" id="blogdescription" name="blogdescription" value="@blogdescription" />
+                    @Html.ValidationMessage("blogdescription")
+                    <p class="description" id="tagline-description">In a few words, explain what this site is about.</p>
+                </div>
+            </div>
+            <br />
+            <div class="form-group">
+                <label for="admin_email" class="col-md-3">E-mail Address</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="text" id="admin_email" name="admin_email" value="@admin_email" />
+                    @Html.ValidationMessage("admin_email")
+                </div>
+            </div>
+            <br />
+
+            <div class="form-group">
+                <label for="users_can_register" class="col-md-3">Membership</label>
+                <div class="col-md-4">
+                    <div class="checkbox">
+                        <label>
+                            @{
+                            string anonymous = string.Empty;
+                            if (users_can_register == "on")
+                            {
+                                anonymous = "Checked";
+                            }
+
+                            }
+                            <input type="checkbox" id="users_can_register" name="users_can_register" @anonymous />
+                            Anyone can register
+                            @Html.ValidationMessage("users_can_register")
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="default_role" class="col-md-3">New User Default Role</label>
+                <div class="col-md-4">
+                    <select name="default_role" class="form-control">
+                        @if (roles != null)
+                    {
+                        foreach (var itemRole in roles)
+                        {
+                            if (itemRole.RoleName == default_role)
+                            {
+                    <option selected>@itemRole.RoleName</option>
+                            }
+                            else
+                            {
+                    <option>@itemRole.RoleName</option>
+                            }
+                        }
+                    }
+                    </select>
+
+                    @Html.ValidationMessage("default_role")
+                </div>
+            </div>
+            <br />
+
+            <div class="form-group">
+                <label for="posts_per_page" class="col-md-3">Blog pages show at most</label>
+                <div class="col-md-3">
+                    <div class="form-inline">
+                        <input class="form-control" type="number" id="posts_per_page" name="posts_per_page" value="@posts_per_page" />&nbsp;posts
+                        @Html.ValidationMessage("posts_per_page")
+                    </div>
+                </div>
+            </div>
+            <br />
+
+            @*<div class="form-group">
+                <label for="blogname" class="col-md-3">Default Post Category</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="text" id="default_category" name="default_category" value="@default_category" />
+                    @Html.ValidationMessage("default_category")
+                </div>
+            </div>
+            <br />*@
+
+            <div class="form-group">
+                <label for="mailserver_port" class="col-md-3">Mail Server</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="text" id="mailserver_url" name="mailserver_url" value="@mailserver_url" />
+                    @Html.ValidationMessage("mailserver_url")
+                </div>
+                <div class="col-md-5">
+                    <label for="mailserver_port" class="col-md-1 control-label">Port</label>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" id="mailserver_port" name="mailserver_port" value="@mailserver_port" />
+                    </div>
+                    @Html.ValidationMessage("mailserver_port")
+                </div>
+            </div>
+            <br />
+            <div class="form-group">
+                <label for="mailserver_login" class="col-md-3">Login Name</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="text" id="mailserver_login" name="mailserver_login" value="@mailserver_login" />
+                    @Html.ValidationMessage("mailserver_login")
+                </div>
+            </div>
+            <br />
+            <div class="form-group">
+                <label for="mailserver_pass" class="col-md-3">Password</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="text" id="mailserver_pass" name="mailserver_pass" value="@mailserver_pass" />
+                    @Html.ValidationMessage("mailserver_pass")
+                </div>
+            </div>
+            <br />
+            @*<div class="form-group">
+                <label for="default_email_category" class="col-md-3">Default Mail Category</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="text" id="default_email_category" name="default_email_category" value="@default_email_category" />
+                    @Html.ValidationMessage("default_email_category")
+                </div>
+            </div>
+            <br />*@
+            <div class="form-group">
+                <div class="col-md-3">
+                    <input class="btn btn-primary" type="submit" name="Submit" value="Save changes" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
